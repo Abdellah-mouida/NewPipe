@@ -3,6 +3,7 @@ package org.schabi.newpipe.util.image
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import coil3.executeBlocking
@@ -11,6 +12,7 @@ import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
+import coil3.request.listener
 import coil3.request.placeholder
 import coil3.request.target
 import coil3.request.transformations
@@ -63,6 +65,61 @@ object CoilHelper {
         url: String?
     ) {
         loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
+    }
+
+    /**
+     * Loads a stream thumbnail and animates the decoded image into place.
+     *
+     * The placeholder remains visible while the request is pending or fails.
+     * View properties are reset for every request so RecyclerView reuse cannot
+     * leave a recycled thumbnail transparent or scaled down.
+     */
+    fun loadThumbnailAnimated(
+        target: ImageView,
+        images: List<Image>
+    ) {
+        val url = ImageStrategy.choosePreferredImage(images)
+        if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
+            loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
+            return
+        }
+
+        target.animate().cancel()
+        target.alpha = 1f
+        target.scaleX = 1f
+        target.scaleY = 1f
+
+        val request = getImageRequest(
+            target.context,
+            url,
+            R.drawable.placeholder_thumbnail_video
+        )
+            .crossfade(false)
+            .target(target)
+            .listener(
+                onStart = {
+                    target.animate().cancel()
+                    target.alpha = 1f
+                    target.scaleX = 1f
+                    target.scaleY = 1f
+                },
+                onSuccess = { _, _ ->
+                    target.animate().cancel()
+                    target.alpha = 0f
+                    target.scaleX = 0.985f
+                    target.scaleY = 0.985f
+                    target.animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(280L)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+                }
+            )
+            .build()
+
+        target.context.imageLoader.enqueue(request)
     }
 
     fun loadScaledDownThumbnail(

@@ -270,8 +270,8 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         // Blur the live page content beneath the floating navigation surface.
         binding.mainTabBlur.setupWith(binding.blurTarget)
-                .setBlurRadius(20f)
-                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 178));
+                .setBlurRadius(22f)
+                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 142));
         binding.mainTabBlur.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
         binding.mainTabBlur.setClipToOutline(true);
 

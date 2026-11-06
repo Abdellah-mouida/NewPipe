@@ -241,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setupDrawer() throws ExtractionException {
         addDrawerMenuForCurrentService();
+        drawerLayoutBinding.navigation.setNavigationItemSelectedListener(this::drawerItemSelected);
+        setupDrawerHeader();
 
         toggle = new ActionBarDrawerToggle(this, mainBinding.getRoot(),
                 toolbarLayoutBinding.toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -271,47 +273,50 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        drawerLayoutBinding.navigation.setNavigationItemSelectedListener(this::drawerItemSelected);
-        setupDrawerHeader();
     }
 
     private void prepareDrawerEntrance() {
-        // Hide the drawer contents before the first slide frame so the
-        // NavigationView cannot flash fully visible before its children animate.
-        drawerLayoutBinding.navigation.setAlpha(0f);
+        // Keep the drawer surface stable. Hide only its contents before the first
+        // animation frame so menu rows cannot flash in at full opacity.
+        drawerHeaderBinding.getRoot().animate().cancel();
         drawerHeaderBinding.getRoot().setAlpha(0f);
         drawerHeaderBinding.getRoot().setTranslationY(-dp(10));
-        drawerLayoutBinding.navigation.post(() -> {
-            final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
-            if (menu == null) {
-                return;
-            }
-            for (int i = 0; i < menu.getChildCount(); i++) {
-                final View item = menu.getChildAt(i);
-                item.setAlpha(0f);
-                item.setTranslationX(dp(18));
-            }
-        });
-    }
-
-    private void applyDrawerEntranceProgress(final float rawProgress) {
-        final float progress = Math.max(0f, Math.min(1f, rawProgress));
-        drawerLayoutBinding.navigation.setAlpha(progress);
-        final View header = drawerHeaderBinding.getRoot();
-        header.setAlpha(progress);
-        header.setTranslationY(-dp(10) * (1f - progress));
 
         final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
         if (menu == null) {
             return;
         }
-        for (int i = 0; i < menu.getChildCount(); i++) {
-            final View item = menu.getChildAt(i);
-            final float itemProgress = Math.max(0f, Math.min(1f, (progress - i * 0.035f) / 0.72f));
-            item.setAlpha(itemProgress);
-            item.setTranslationX(dp(18) * (1f - itemProgress));
+        menu.animate().cancel();
+        menu.setAlpha(0f);
+        menu.setTranslationX(drawerMenuEntryOffset());
+        menu.setScaleX(0.985f);
+        menu.setScaleY(0.985f);
+    }
+
+    private void applyDrawerEntranceProgress(final float rawProgress) {
+        final float progress = Math.max(0f, Math.min(1f, rawProgress));
+        // Smoothstep follows the user's drag/open gesture from the first frame.
+        final float easedProgress = progress * progress * (3f - 2f * progress);
+
+        final View header = drawerHeaderBinding.getRoot();
+        header.setAlpha(easedProgress);
+        header.setTranslationY(-dp(10) * (1f - easedProgress));
+
+        final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
+        if (menu == null) {
+            return;
         }
+        menu.setAlpha(easedProgress);
+        menu.setTranslationX(drawerMenuEntryOffset() * (1f - easedProgress));
+        final float scale = 0.985f + (0.015f * easedProgress);
+        menu.setScaleX(scale);
+        menu.setScaleY(scale);
+    }
+
+    private float drawerMenuEntryOffset() {
+        final boolean isRtl = drawerLayoutBinding.navigation.getLayoutDirection()
+                == View.LAYOUT_DIRECTION_RTL;
+        return isRtl ? -dp(18) : dp(18);
     }
 
     @Nullable
@@ -589,6 +594,7 @@ public class MainActivity extends AppCompatActivity {
         // Close drawer on return, and don't show animation,
         // so it looks like the drawer isn't open when the user returns to MainActivity
         mainBinding.getRoot().closeDrawer(GravityCompat.START, false);
+        prepareDrawerEntrance();
         try {
             final int selectedServiceId = ServiceHelper.getSelectedServiceId(this);
             final String selectedServiceName = NewPipe.getService(selectedServiceId)
