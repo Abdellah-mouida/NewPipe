@@ -77,7 +77,7 @@ Floating bottom navigation, More sheet and rail are deferred until fragment-stac
 
 | Check | Result | Evidence / limitation |
 |---|---|---|
-| Branch and change inventory | PASS | GitHub reports branch `redesign/premium-ui` is 4 commits ahead of `dev`, with 38 changed files |
+| Branch and change inventory | PASS | GitHub reports branch `redesign/premium-ui` is ahead of `dev`, with 38 changed files |
 | New token and layout references | Source-inspected | New color references resolve against committed palette and legacy color resources; this is not an AAPT compile |
 | `./gradlew assembleDebug` | NOT RUN | No repository checkout, Gradle runner or Android SDK is exposed in this connected GitHub session |
 | Release/minified R8 build | NOT RUN | Same environment limitation |
