@@ -2,27 +2,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
-    <org.schabi.newpipe.views.ScrollableTabLayout
-        android:id="@+id/main_tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="?attr/windowBackground"
-        app:tabRippleColor="?attr/colorControlHighlight"
-        app:tabIconTint="?attr/actionColor"
-        app:tabIndicatorColor="?attr/colorAccent"
-        app:tabTextColor="?attr/actionColor"
-        app:tabSelectedTextColor="?attr/colorAccent"
-        app:tabGravity="fill"
-        app:tabMinWidth="60dp" />
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/main_tab_layout" />
+        android:layout_above="@id/main_tab_layout" />
+
+    <org.schabi.newpipe.views.ScrollableTabLayout
+        android:id="@+id/main_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/np_bottom_nav_background"
+        android:elevation="16dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:tabGravity="fill"
+        app:tabIndicator="@drawable/np_bottom_nav_indicator"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorGravity="center"
+        app:tabIndicatorHeight="44dp"
+        app:tabMinWidth="64dp"
+        app:tabRippleColor="?attr/colorControlHighlight" />
 
 </RelativeLayout>

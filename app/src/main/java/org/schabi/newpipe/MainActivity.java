@@ -38,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -57,6 +58,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -251,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(final View drawerView) {
                 lastService = ServiceHelper.getSelectedServiceId(MainActivity.this);
+                animateDrawerItems();
             }
 
             @Override
@@ -266,6 +269,60 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayoutBinding.navigation.setNavigationItemSelectedListener(this::drawerItemSelected);
         setupDrawerHeader();
+    }
+
+    private void animateDrawerItems() {
+        final View header = drawerHeaderBinding.getRoot();
+        header.animate().cancel();
+        header.setAlpha(0f);
+        header.setTranslationY(-dp(10));
+        header.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(260L)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+
+        drawerLayoutBinding.navigation.post(() -> {
+            final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
+            if (menu == null) {
+                return;
+            }
+            for (int i = 0; i < menu.getChildCount(); i++) {
+                final View item = menu.getChildAt(i);
+                item.animate().cancel();
+                item.setAlpha(0f);
+                item.setTranslationX(dp(18));
+                item.animate()
+                        .alpha(1f)
+                        .translationX(0f)
+                        .setStartDelay(i * 26L)
+                        .setDuration(240L)
+                        .setInterpolator(new DecelerateInterpolator())
+                        .start();
+            }
+        });
+    }
+
+    @Nullable
+    private RecyclerView findNavigationRecyclerView(@NonNull final View view) {
+        if (view instanceof RecyclerView) {
+            return (RecyclerView) view;
+        }
+        if (view instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                final RecyclerView found = findNavigationRecyclerView(group.getChildAt(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private int dp(final int value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     /**

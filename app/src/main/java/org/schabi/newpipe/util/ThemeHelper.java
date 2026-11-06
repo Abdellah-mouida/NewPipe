@@ -379,7 +379,8 @@ public final class ThemeHelper {
             if (useGrid) {
                 result = ItemViewMode.GRID;
             } else {
-                result = ItemViewMode.LIST;
+                // Use the large, full-width video cards as the phone-first default.
+                result = ItemViewMode.CARD;
             }
         }
         return result;

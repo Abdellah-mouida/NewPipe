@@ -2,15 +2,10 @@ package org.schabi.newpipe.fragments;
 
 import static android.widget.RelativeLayout.ABOVE;
 import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
-import static android.widget.RelativeLayout.ALIGN_PARENT_TOP;
-import static android.widget.RelativeLayout.BELOW;
-import static com.google.android.material.tabs.TabLayout.INDICATOR_GRAVITY_BOTTOM;
-import static com.google.android.material.tabs.TabLayout.INDICATOR_GRAVITY_TOP;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -62,8 +60,6 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     private SharedPreferences prefs;
     private boolean youtubeRestrictedModeEnabled;
     private String youtubeRestrictedModeEnabledKey;
-    private boolean mainTabsPositionBottom;
-    private String mainTabsPositionKey;
 
     /*//////////////////////////////////////////////////////////////////////////
     // Fragment's LifeCycle
@@ -89,8 +85,6 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         youtubeRestrictedModeEnabledKey = getString(R.string.youtube_restricted_mode_enabled);
         youtubeRestrictedModeEnabled = prefs.getBoolean(youtubeRestrictedModeEnabledKey, false);
-        mainTabsPositionKey = getString(R.string.main_tabs_position_key);
-        mainTabsPositionBottom = prefs.getBoolean(mainTabsPositionKey, false);
     }
 
     @Override
@@ -108,6 +102,13 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         binding.mainTabLayout.setupWithViewPager(binding.pager);
         binding.mainTabLayout.addOnTabSelectedListener(this);
+        binding.pager.setPageTransformer(true, (page, position) -> {
+            final float distance = Math.min(1f, Math.abs(position));
+            page.setAlpha(1f - (distance * 0.18f));
+            page.setTranslationY(dp(10) * distance);
+            page.setScaleX(1f - (distance * 0.02f));
+            page.setScaleY(1f - (distance * 0.02f));
+        });
 
         setupTabs();
         updateTabLayoutPosition();
@@ -124,11 +125,6 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             setupTabs();
         }
 
-        final boolean newMainTabsPosition = prefs.getBoolean(mainTabsPositionKey, false);
-        if (mainTabsPositionBottom != newMainTabsPosition) {
-            mainTabsPositionBottom = newMainTabsPosition;
-            updateTabLayoutPosition();
-        }
     }
 
     @Override
@@ -208,9 +204,52 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             final TabLayout.Tab tabToSet = binding.mainTabLayout.getTabAt(i);
             if (tabToSet != null) {
                 final Tab tab = tabsList.get(i);
-                tabToSet.setIcon(tab.getTabIconRes(requireContext()));
+                final View tabView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.item_bottom_nav_tab, null, false);
+                final ImageView icon = tabView.findViewById(R.id.bottom_nav_icon);
+                final TextView label = tabView.findViewById(R.id.bottom_nav_label);
+                icon.setImageResource(tab.getTabIconRes(requireContext()));
+                label.setText(tab.getTabName(requireContext()));
+                tabToSet.setCustomView(tabView);
                 tabToSet.setContentDescription(tab.getTabName(requireContext()));
+                applyTabAppearance(tabToSet, i == binding.pager.getCurrentItem(), false);
             }
+        }
+    }
+
+    private void applyTabAppearance(final TabLayout.Tab tab, final boolean selected,
+                                    final boolean animate) {
+        final View tabView = tab.getCustomView();
+        if (tabView == null) {
+            return;
+        }
+        final ImageView icon = tabView.findViewById(R.id.bottom_nav_icon);
+        final TextView label = tabView.findViewById(R.id.bottom_nav_label);
+        if (icon == null || label == null) {
+            return;
+        }
+
+        final int tint = ThemeHelper.resolveColorFromAttr(requireContext(), selected
+                ? R.attr.npColorOnAccent : R.attr.npColorOnSurfaceVariant);
+        icon.setImageTintList(ColorStateList.valueOf(tint));
+        label.setTextColor(tint);
+        tabView.setSelected(selected);
+        icon.setSelected(selected);
+        label.setSelected(selected);
+
+        tabView.animate().cancel();
+        if (animate && selected) {
+            tabView.setScaleX(0.88f);
+            tabView.setScaleY(0.88f);
+            tabView.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(220L)
+                    .setInterpolator(new OvershootInterpolator(1.15f))
+                    .start();
+        } else {
+            tabView.setScaleX(selected ? 1f : 0.96f);
+            tabView.setScaleY(selected ? 1f : 0.96f);
         }
     }
 
@@ -227,33 +266,29 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
     private void updateTabLayoutPosition() {
         final ScrollableTabLayout tabLayout = binding.mainTabLayout;
         final ViewPager viewPager = binding.pager;
-        final boolean bottom = mainTabsPositionBottom;
-
-        // change layout params to make the tab layout appear either at the top or at the bottom
         final var tabParams = (RelativeLayout.LayoutParams) tabLayout.getLayoutParams();
         final var pagerParams = (RelativeLayout.LayoutParams) viewPager.getLayoutParams();
 
-        tabParams.removeRule(bottom ? ALIGN_PARENT_TOP : ALIGN_PARENT_BOTTOM);
-        tabParams.addRule(bottom ? ALIGN_PARENT_BOTTOM : ALIGN_PARENT_TOP);
-        pagerParams.removeRule(bottom ? BELOW : ABOVE);
-        pagerParams.addRule(bottom ? ABOVE : BELOW, R.id.main_tab_layout);
-        tabLayout.setSelectedTabIndicatorGravity(
-                bottom ? INDICATOR_GRAVITY_TOP : INDICATOR_GRAVITY_BOTTOM);
+        tabParams.addRule(ALIGN_PARENT_BOTTOM);
+        tabParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+        pagerParams.addRule(ABOVE, R.id.main_tab_layout);
+        pagerParams.removeRule(RelativeLayout.BELOW);
+        pagerParams.bottomMargin = dp(14);
 
         tabLayout.setLayoutParams(tabParams);
         viewPager.setLayoutParams(pagerParams);
+        tabLayout.setBackgroundResource(R.drawable.np_bottom_nav_background);
+        tabLayout.setSelectedTabIndicatorGravity(TabLayout.INDICATOR_GRAVITY_CENTER);
+        tabLayout.setTabIndicatorFullWidth(false);
 
-        // change the background and icon color of the tab layout:
-        // service-colored at the top, app-background-colored at the bottom
-        tabLayout.setBackgroundColor(ThemeHelper.resolveColorFromAttr(requireContext(),
-                bottom ? android.R.attr.windowBackground : R.attr.colorPrimary));
+        @ColorInt final int accent = ThemeHelper.resolveColorFromAttr(
+                requireContext(), R.attr.npColorAccent);
+        tabLayout.setTabRippleColor(ColorStateList.valueOf(accent).withAlpha(28));
+        tabLayout.setSelectedTabIndicatorColor(accent);
+    }
 
-        @ColorInt final int iconColor = bottom
-                ? ThemeHelper.resolveColorFromAttr(requireContext(), android.R.attr.colorAccent)
-                : Color.WHITE;
-        tabLayout.setTabRippleColor(ColorStateList.valueOf(iconColor).withAlpha(32));
-        tabLayout.setTabIconTint(ColorStateList.valueOf(iconColor));
-        tabLayout.setSelectedTabIndicatorColor(iconColor);
+    private int dp(final int value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     @Override
@@ -262,10 +297,13 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             Log.d(TAG, "onTabSelected() called with: selectedTab = [" + selectedTab + "]");
         }
         updateTitleForTab(selectedTab.getPosition());
+        applyTabAppearance(selectedTab, true, true);
     }
 
     @Override
-    public void onTabUnselected(final TabLayout.Tab tab) { }
+    public void onTabUnselected(final TabLayout.Tab tab) {
+        applyTabAppearance(tab, false, false);
+    }
 
     @Override
     public void onTabReselected(final TabLayout.Tab tab) {
@@ -273,6 +311,7 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
             Log.d(TAG, "onTabReselected() called with: tab = [" + tab + "]");
         }
         updateTitleForTab(tab.getPosition());
+        applyTabAppearance(tab, true, true);
     }
 
     public static final class SelectedTabsPagerAdapter
