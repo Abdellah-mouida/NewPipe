@@ -6,6 +6,10 @@ on:
       - dev
       - master
       - 'redesign/**'
+    # The release job bumps only this file after publishing. Do not start a
+    # second CI/release cycle for that bot-generated version-only commit.
+    paths-ignore:
+      - buildSrc/src/main/kotlin/ProjectConfig.kt
 
   pull_request:
     branches:
@@ -154,9 +158,9 @@ jobs:
 
 
   publish-stable:
-    name: Publish signed stable release
+    name: Publish signed release and bump next version
     needs: [build, android-tests]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/redesign/premium-ui'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/redesign/premium-ui' && needs.build.result == 'success' && needs.android-tests.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
@@ -168,7 +172,27 @@ jobs:
         with:
           ref: ${{ github.sha }}
 
+      - name: Ensure this tested commit is still the branch head
+        id: head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Release skipped"
+              echo
+              echo "A newer commit reached \`$GITHUB_REF_NAME\` while this CI run was executing."
+              echo "The newer commit will be released by its own successful CI run."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Set up Java 21
+        if: steps.head.outputs.current == 'true'
         uses: actions/setup-java@v6
         with:
           distribution: temurin
@@ -176,15 +200,18 @@ jobs:
           cache: gradle
 
       - name: Set up Android SDK
+        if: steps.head.outputs.current == 'true'
         uses: android-actions/setup-android@v4
 
       - name: Install Android SDK 37.0
+        if: steps.head.outputs.current == 'true'
         run: |
           android sdk install \
             platforms/android-37.0 \
             build-tools/37.0.0
 
-      - name: Check release signing secrets
+      - name: Require Android release signing secrets
+        if: steps.head.outputs.current == 'true'
         id: signing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -201,23 +228,15 @@ jobs:
             fi
           done
 
-          if [[ "$present" == "0" ]]; then
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            {
-              echo "## Stable release not published"
-              echo
-              echo "Configure all four Android signing secrets to publish a production-signed APK and AAB."
-              echo "The CI build, lint, unit tests, and emulator tests have completed independently."
-            } >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "$present" == "4" ]]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Only some Android signing secrets are configured. Configure all four or none." >&2
+          if [[ "$present" != "4" ]]; then
+            echo "All four Android signing secrets are required for an automatic stable release." >&2
+            echo "Required: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD." >&2
             exit 1
           fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
 
       - name: Restore release keystore
-        if: steps.signing.outputs.enabled == 'true'
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         shell: bash
@@ -229,7 +248,7 @@ jobs:
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/newpipe-release.jks" >> "$GITHUB_ENV"
 
       - name: Build signed release APK and AAB
-        if: steps.signing.outputs.enabled == 'true'
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
         env:
           ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/newpipe-release.jks
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -239,7 +258,7 @@ jobs:
           ./gradlew --no-daemon assembleRelease bundleRelease --stacktrace
 
       - name: Verify and name release packages
-        if: steps.signing.outputs.enabled == 'true'
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -255,8 +274,23 @@ jobs:
           mv "$aab" "NewPipe-v${version_name}.aab"
           echo "VERSION_NAME=$version_name" >> "$GITHUB_ENV"
 
+      - name: Recheck branch head before publishing
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
+        id: publish-head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "A newer commit arrived during the release build; skipping this publication." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Publish stable GitHub release
-        if: steps.signing.outputs.enabled == 'true'
+        if: steps.publish-head.outputs.current == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -265,20 +299,83 @@ jobs:
           tag="v${VERSION_NAME}"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $tag already exists; leaving the published release unchanged." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          gh release create "$tag" \
-            "NewPipe-v${VERSION_NAME}.apk" \
-            "NewPipe-v${VERSION_NAME}.aab" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "NewPipe ${VERSION_NAME}" \
-            --latest \
-            --notes "Stable release of the NewPipe redesign fork.
+          else
+            gh release create "$tag" \
+              "NewPipe-v${VERSION_NAME}.apk" \
+              "NewPipe-v${VERSION_NAME}.aab" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe ${VERSION_NAME}" \
+              --latest \
+              --notes "Stable release of the NewPipe redesign fork.
 
           - Source branch: redesign/premium-ui
           - Tested commit: $GITHUB_SHA
-          - CI build, lint, unit tests, and Android emulator tests passed.
-          - APK is signed with this fork's upload/release key.
+          - CI build, lint, unit tests, and both Android emulator test jobs passed.
+          - APK and AAB are signed with this fork's release key.
 
           This is an unofficial fork of TeamNewPipe/NewPipe. Back up your data before switching from a differently signed NewPipe installation."
+          fi
+
+      - name: Bump version for the next development cycle
+        if: steps.publish-head.outputs.current == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Do not overwrite a newer commit if the branch advanced after publication.
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" != "$GITHUB_SHA" ]]; then
+            echo "Branch advanced after publication; leaving its version file untouched." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+
+          path = Path("buildSrc/src/main/kotlin/ProjectConfig.kt")
+          source = path.read_text(encoding="utf-8")
+
+          version_pattern = re.compile(
+              r'(?m)^const val NEWPIPE_VERSION_NAME = "(\d+)\.(\d+)\.(\d+)"$'
+          )
+          code_pattern = re.compile(r"(?m)^const val NEWPIPE_VERSION_CODE = (\d+)$")
+
+          version_match = version_pattern.search(source)
+          code_match = code_pattern.search(source)
+          if not version_match or not code_match:
+              raise SystemExit("Could not safely parse the app version and version code.")
+
+          major, minor, patch = map(int, version_match.groups())
+          next_version = f"{major}.{minor}.{patch + 1}"
+          next_code = int(code_match.group(1)) + 1
+
+          source = version_pattern.sub(
+              f'const val NEWPIPE_VERSION_NAME = "{next_version}"',
+              source,
+              count=1,
+          )
+          source = code_pattern.sub(
+              f"const val NEWPIPE_VERSION_CODE = {next_code}",
+              source,
+              count=1,
+          )
+          path.write_text(source, encoding="utf-8")
+          print(f"Prepared next development version: {next_version} (code {next_code})")
+          PY
+
+          next_version="$(sed -n 's/^const val NEWPIPE_VERSION_NAME = "\(.*\)"/\1/p' buildSrc/src/main/kotlin/ProjectConfig.kt)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add buildSrc/src/main/kotlin/ProjectConfig.kt
+          git commit -m "chore(release): prepare v${next_version}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+
+          {
+            echo "## Automatic release published"
+            echo
+            echo "- Published release: [v${VERSION_NAME}](https://github.com/${GITHUB_REPOSITORY}/releases/tag/v${VERSION_NAME})"
+            echo "- Next development version: ${next_version}"
+          } >> "$GITHUB_STEP_SUMMARY"
