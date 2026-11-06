@@ -5,16 +5,17 @@
     android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:background="@drawable/np_video_card"
     android:clickable="true"
     android:stateListAnimator="@animator/np_press_scale"
-    android:focusable="true">
+    android:focusable="true"
+    android:elevation="4dp">
 
     <ImageView
         android:id="@+id/itemThumbnailView"
