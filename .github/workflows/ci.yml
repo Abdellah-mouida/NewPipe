@@ -148,13 +148,14 @@ jobs:
           arch: ${{ matrix.arch }}
           disable-animations: true
           script: |
-            set -euo pipefail
+            # The action invokes this through /usr/bin/sh, not Bash.
+            set -eu
             ./gradlew --no-daemon connectedCheck --stacktrace
 
             # API 27 is Android 8.1, the platform in the reported ACRA crash.
             # Launch the real app while this emulator is still booted so resource
             # inflation failures cannot slip through a compile-only CI run.
-            if [[ "${{ matrix.api-level }}" == "27" ]]; then
+            if [ "${{ matrix.api-level }}" = "27" ]; then
               ./gradlew --no-daemon assembleContinuous --stacktrace
               apk="$(find app/build/outputs/apk/continuous -maxdepth 1 -type f -name '*.apk' -print -quit)"
               test -n "$apk"
@@ -166,8 +167,8 @@ jobs:
               adb shell am start -W -n "$package_name/org.schabi.newpipe.MainActivity"
               sleep 5
               runtime_log="$(adb logcat -d -s AndroidRuntime:E)"
-              if grep -Eq 'FATAL EXCEPTION|Unable to start activity|Error inflating class' <<< "$runtime_log"; then
-                echo "$runtime_log"
+              if printf '%s\n' "$runtime_log" | grep -E 'FATAL EXCEPTION|Unable to start activity|Error inflating class' >/dev/null; then
+                printf '%s\n' "$runtime_log"
                 exit 1
               fi
               adb shell pidof "$package_name" >/dev/null
