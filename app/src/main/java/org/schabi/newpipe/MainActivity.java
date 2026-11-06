@@ -38,7 +38,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -247,17 +246,23 @@ public class MainActivity extends AppCompatActivity {
                 toolbarLayoutBinding.toolbar, R.string.drawer_open, R.string.drawer_close);
         toggle.syncState();
         mainBinding.getRoot().addDrawerListener(toggle);
+        prepareDrawerEntrance();
         mainBinding.getRoot().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             private int lastService;
 
             @Override
+            public void onDrawerSlide(@NonNull final View drawerView, final float slideOffset) {
+                applyDrawerEntranceProgress(slideOffset);
+            }
+
+            @Override
             public void onDrawerOpened(final View drawerView) {
                 lastService = ServiceHelper.getSelectedServiceId(MainActivity.this);
-                animateDrawerItems();
             }
 
             @Override
             public void onDrawerClosed(final View drawerView) {
+                prepareDrawerEntrance();
                 if (servicesShown) {
                     toggleServices();
                 }
@@ -271,18 +276,9 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerHeader();
     }
 
-    private void animateDrawerItems() {
-        final View header = drawerHeaderBinding.getRoot();
-        header.animate().cancel();
-        header.setAlpha(0f);
-        header.setTranslationY(-dp(10));
-        header.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setDuration(260L)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
-
+    private void prepareDrawerEntrance() {
+        drawerHeaderBinding.getRoot().setAlpha(0f);
+        drawerHeaderBinding.getRoot().setTranslationY(-dp(10));
         drawerLayoutBinding.navigation.post(() -> {
             final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
             if (menu == null) {
@@ -290,18 +286,28 @@ public class MainActivity extends AppCompatActivity {
             }
             for (int i = 0; i < menu.getChildCount(); i++) {
                 final View item = menu.getChildAt(i);
-                item.animate().cancel();
                 item.setAlpha(0f);
                 item.setTranslationX(dp(18));
-                item.animate()
-                        .alpha(1f)
-                        .translationX(0f)
-                        .setStartDelay(i * 26L)
-                        .setDuration(240L)
-                        .setInterpolator(new DecelerateInterpolator())
-                        .start();
             }
         });
+    }
+
+    private void applyDrawerEntranceProgress(final float rawProgress) {
+        final float progress = Math.max(0f, Math.min(1f, rawProgress));
+        final View header = drawerHeaderBinding.getRoot();
+        header.setAlpha(progress);
+        header.setTranslationY(-dp(10) * (1f - progress));
+
+        final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
+        if (menu == null) {
+            return;
+        }
+        for (int i = 0; i < menu.getChildCount(); i++) {
+            final View item = menu.getChildAt(i);
+            final float itemProgress = Math.max(0f, Math.min(1f, (progress - i * 0.035f) / 0.72f));
+            item.setAlpha(itemProgress);
+            item.setTranslationX(dp(18) * (1f - itemProgress));
+        }
     }
 
     @Nullable

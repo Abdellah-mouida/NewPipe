@@ -271,13 +271,15 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
         tabParams.addRule(ALIGN_PARENT_BOTTOM);
         tabParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
-        pagerParams.addRule(ABOVE, R.id.main_tab_layout);
+        pagerParams.removeRule(ABOVE);
         pagerParams.removeRule(RelativeLayout.BELOW);
-        pagerParams.bottomMargin = dp(14);
+        pagerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        pagerParams.bottomMargin = 0;
 
         tabLayout.setLayoutParams(tabParams);
         viewPager.setLayoutParams(pagerParams);
         tabLayout.setBackgroundResource(R.drawable.np_bottom_nav_background);
+        tabLayout.setElevation(dp(20));
         tabLayout.setSelectedTabIndicatorGravity(TabLayout.INDICATOR_GRAVITY_CENTER);
         tabLayout.setTabIndicatorFullWidth(false);
 
