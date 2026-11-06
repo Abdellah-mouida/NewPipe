@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aurora_nav_home">Home</string>
+    <string name="aurora_nav_subscriptions">Subscriptions</string>
+    <string name="aurora_nav_library">Library</string>
+    <string name="aurora_nav_downloads">Downloads</string>
+    <string name="aurora_nav_more">More</string>
+    <string name="aurora_search_hint">Search videos, channels, and more</string>
+</resources>

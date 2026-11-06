@@ -5,27 +5,37 @@
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground">
 
+    <org.schabi.newpipe.views.AuroraSearchPill
+        android:id="@+id/aurora_search_pill"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp" />
+
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/aurora_search_pill"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/main_tab_background"
         android:padding="4dp"
         app:tabGravity="fill"
-        app:tabIndicatorColor="@color/dark_youtube_accent_color"
+        app:tabIndicatorColor="?attr/colorAccent"
         app:tabMaxWidth="0dp"
         app:tabMinWidth="60dp"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/dark_card_item_contrast_color" />
+        app:tabSelectedTextColor="?attr/colorAccent"
+        app:tabTextColor="?attr/card_item_contrast_color" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/main_tab_layout" />
+        android:layout_below="@id/main_tab_layout"
+        android:clipToPadding="false"
+        android:paddingBottom="88dp" />
 
 </RelativeLayout>
