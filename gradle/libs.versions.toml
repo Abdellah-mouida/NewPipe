@@ -12,6 +12,7 @@ appcompat = "1.8.0"
 assertj = "3.27.7"
 autoservice-google = "1.1.1"
 autoservice-zacsweers = "1.2.0"
+blurview = "version-3.2.0"
 bridge = "v2.0.2"
 browser = "1.10.0"
 cardview = "1.0.0"
@@ -115,6 +116,7 @@ androidx-work-rxjava3 = { module = "androidx.work:work-rxjava3", version.ref = "
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+dimezis-blurview = { module = "com.github.Dimezis:BlurView", version.ref = "blurview" }
 evernote-statesaver-compiler = { module = "com.evernote:android-state-processor", version.ref = "statesaver" }
 evernote-statesaver-core = { module = "com.evernote:android-state", version.ref = "statesaver" }
 facebook-stetho-core = { module = "com.facebook.stetho:stetho", version.ref = "stetho" }

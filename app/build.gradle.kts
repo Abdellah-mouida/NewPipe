@@ -285,6 +285,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Third-party libraries
+    implementation(libs.dimezis.blurview)
     implementation(libs.livefront.bridge)
     implementation(libs.evernote.statesaver.core)
     kapt(libs.evernote.statesaver.compiler)

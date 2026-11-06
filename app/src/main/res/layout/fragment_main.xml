@@ -1,37 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/windowBackground"
     android:clipChildren="false"
     android:clipToPadding="false">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager"
+    <eightbitlab.com.blurview.BlurTarget
+        android:id="@+id/blur_target"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_height="match_parent">
 
-    <org.schabi.newpipe.views.ScrollableTabLayout
-        android:id="@+id/main_tab_layout"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/np_main_background"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true" />
+
+        </RelativeLayout>
+    </eightbitlab.com.blurview.BlurTarget>
+
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/main_tab_blur"
         android:layout_width="match_parent"
         android:layout_height="68dp"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:layout_marginStart="14dp"
         android:layout_marginEnd="14dp"
         android:layout_marginBottom="12dp"
         android:background="@drawable/np_bottom_nav_background"
-        android:elevation="16dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        app:tabGravity="fill"
-        app:tabIndicator="@drawable/np_bottom_nav_indicator"
-        app:tabIndicatorAnimationMode="elastic"
-        app:tabIndicatorFullWidth="false"
-        app:tabIndicatorGravity="center"
-        app:tabIndicatorHeight="44dp"
-        app:tabMinWidth="64dp"
-        app:tabRippleColor="?attr/colorControlHighlight" />
+        android:clipToOutline="true"
+        android:elevation="20dp"
+        android:outlineProvider="background">
 
-</RelativeLayout>
+        <org.schabi.newpipe.views.ScrollableTabLayout
+            android:id="@+id/main_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            app:tabGravity="fill"
+            app:tabIndicator="@drawable/np_bottom_nav_indicator"
+            app:tabIndicatorAnimationMode="elastic"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorGravity="center"
+            app:tabIndicatorHeight="44dp"
+            app:tabMinWidth="64dp"
+            app:tabRippleColor="?attr/colorControlHighlight" />
+
+    </eightbitlab.com.blurview.BlurView>
+
+</FrameLayout>

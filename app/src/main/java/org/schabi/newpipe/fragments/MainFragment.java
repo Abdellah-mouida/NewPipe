@@ -1,11 +1,10 @@
 package org.schabi.newpipe.fragments;
 
-import static android.widget.RelativeLayout.ABOVE;
-import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,14 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorUtils;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -265,21 +265,18 @@ public class MainFragment extends BaseFragment implements TabLayout.OnTabSelecte
 
     private void updateTabLayoutPosition() {
         final ScrollableTabLayout tabLayout = binding.mainTabLayout;
-        final ViewPager viewPager = binding.pager;
-        final var tabParams = (RelativeLayout.LayoutParams) tabLayout.getLayoutParams();
-        final var pagerParams = (RelativeLayout.LayoutParams) viewPager.getLayoutParams();
+        final int glassColor = ThemeHelper.resolveColorFromAttr(
+                requireContext(), R.attr.npColorGlass);
 
-        tabParams.addRule(ALIGN_PARENT_BOTTOM);
-        tabParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
-        pagerParams.removeRule(ABOVE);
-        pagerParams.removeRule(RelativeLayout.BELOW);
-        pagerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        pagerParams.bottomMargin = 0;
+        // Blur the live page content beneath the floating navigation surface.
+        binding.mainTabBlur.setupWith(binding.blurTarget)
+                .setBlurRadius(20f)
+                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 178));
+        binding.mainTabBlur.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        binding.mainTabBlur.setClipToOutline(true);
 
-        tabLayout.setLayoutParams(tabParams);
-        viewPager.setLayoutParams(pagerParams);
-        tabLayout.setBackgroundResource(R.drawable.np_bottom_nav_background);
-        tabLayout.setElevation(dp(20));
+        // Let BlurView draw the translucent navigation background.
+        tabLayout.setBackgroundColor(Color.TRANSPARENT);
         tabLayout.setSelectedTabIndicatorGravity(TabLayout.INDICATOR_GRAVITY_CENTER);
         tabLayout.setTabIndicatorFullWidth(false);
 

@@ -277,6 +277,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareDrawerEntrance() {
+        // Hide the drawer contents before the first slide frame so the
+        // NavigationView cannot flash fully visible before its children animate.
+        drawerLayoutBinding.navigation.setAlpha(0f);
         drawerHeaderBinding.getRoot().setAlpha(0f);
         drawerHeaderBinding.getRoot().setTranslationY(-dp(10));
         drawerLayoutBinding.navigation.post(() -> {
@@ -294,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void applyDrawerEntranceProgress(final float rawProgress) {
         final float progress = Math.max(0f, Math.min(1f, rawProgress));
+        drawerLayoutBinding.navigation.setAlpha(progress);
         final View header = drawerHeaderBinding.getRoot();
         header.setAlpha(progress);
         header.setTranslationY(-dp(10) * (1f - progress));
