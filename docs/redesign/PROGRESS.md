@@ -1,0 +1,36 @@
+# Aurora redesign progress
+
+Working branch: redesign/premium-ui  
+Base: dev  
+Last updated: 2026-11-06
+
+| Screen / component | Layout / source files | Dark | AMOLED | Light | Portrait | Landscape | Tablet | RTL | Status | Notes |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| Repository audit and architecture map | docs/redesign/00-AUDIT.md | — | — | — | — | — | — | — | Done | Static source inventory; not runtime verified |
+| Shared Aurora palette and legacy theme aliases | values/np_colors.xml, np_dimens.xml, np_motion.xml, colors.xml, colors_services.xml, attrs.xml, styles.xml, shared/theme/Color.kt, Theme.kt | In progress | In progress | In progress | — | — | — | — | In progress | Aurora palette, semantic theme attributes, theme overlays and Compose palette committed; compile/theme matrix still unverified |
+| Shared motion and component resources | values/np_motion.xml, interpolator/np_*.xml, animator/np_press_scale.xml, drawable/np_*.xml | In progress | In progress | In progress | Not started | Not started | Not started | Not started | In progress | Duration tokens, easing curves, shared press-state animator and rounded card/duration drawables; screen/page transition system pending |
+| Main shell and toolbar | activity_main.xml, toolbar_layout.xml, MainActivity.java | In progress | In progress | In progress | Not started | Not started | Not started | Not started | In progress | Main background and quieter toolbar surface; floating navigation, insets and responsive behavior pending | Preserve drawer and Back stack; no bottom-nav replacement until insets/player integration is proven |
+| Drawer and service switcher | drawer_layout.xml, drawer_header.xml, MainActivity.java | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | All kiosks and services remain reachable |
+| Home tabs and kiosk feeds | fragment_main.xml, MainFragment.java, DefaultKioskFragment.java, KioskFragment.java | In progress | In progress | In progress | Not started | Not started | Not started | Not started | In progress | Theme-aware tab surface, icons, ripple and selected indicator committed; interaction/motion polish pending | Keep user-customizable tabs |
+| Search and suggestions | fragment_search.xml, SearchFragment.java, toolbar_search_layout.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Preserve query/filter behavior |
+| Video, channel, playlist cards | list_stream_*.xml, list_channel_*.xml, list_playlist_*.xml | In progress | In progress | In progress | Not started | Not started | Not started | Not started | In progress | Stream, channel and playlist card/grid/list/mini variants now share rounded artwork, Aurora typography and press-scale feedback; layout matrix still unverified | Rounded thumbnails, hierarchy and progress styling |
+| Subscriptions and feed | SubscriptionFragment.kt, FeedFragment.kt, fragment_subscription.xml, fragment_feed.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Includes groups and notification channels |
+| Channel pages | ChannelFragment.java, ChannelTabFragment.java, fragment_channel*.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Preserve subscribe and tab behavior |
+| Video detail and description | VideoDetailFragment.java, DescriptionFragment.java, fragment_video_detail.xml, fragment_description.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | UI only; no player logic changes |
+| Main player / popup / background / queue | PlayerService.java, player views, PlayQueueActivity.java | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Highest polish priority; regression checks not run |
+| Comments and replies | CommentsFragment.java, CommentRepliesFragment.java, fragment_comments.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Preserve likes, badges and reply flows |
+| Library, bookmarks and playlists | BookmarkFragment.java, LocalPlaylistFragment.java, PlaylistFragment.java | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Includes local and remote playlists |
+| History | StatisticsPlaylistFragment.java and local playlist layouts | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Preserve watch-history preference and clearing |
+| Downloads | DownloadActivity.java, mission_item*.xml, missions.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Preserve download manager and notification logic |
+| Settings / appearance / all preference screens | SettingsActivity.java, settings/*.java, appearance_settings.xml, Compose settings | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Existing settings routes and stored keys remain |
+| Backup, restore and import/export | BackupRestoreSettingsFragment.java, SubscriptionsImportFragment.java, fragment_import.xml | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Needs round-trip verification |
+| About, licenses, help, donate and updates | AboutActivity.java, Compose About/License, UpdateSettingsFragment.java | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Secondary surfaces |
+| Error, crash, reCAPTCHA, pickers and router | ErrorActivity.kt, ReCaptchaActivity.java, RouterActivity.java, picker helpers | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Special-purpose themes need explicit audit |
+| Notifications and widgets | player/download/feed notification sources and layouts | Not started | Not started | Not started | — | — | — | — | Not started | Keep notification channels and actions unchanged |
+| Responsive, RTL, accessibility and motion hardening | shared motion resources and all screen groups | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Requires device/emulator test matrix |
+| Final build, tests and report | Gradle tasks, screenshots, FINAL_REPORT.md | — | — | — | — | — | — | — | Not started | SDK/emulator unavailable in this session |
+
+## Verification log
+
+- 2026-11-06: Confirmed source tree, module structure, Gradle/plugin/dependency versions, SDK values, theme helpers, primary navigation entry points and player-sheet host through GitHub source inspection.
+- Not run: ./gradlew assembleDebug, release/minified build, lint, unit tests, instrumentation, screenshots, emulator/device launch, real playback checks, RTL/font-scale/tablet/performance checks. The connected GitHub environment does not expose a checkout or Android SDK/Gradle runner.
