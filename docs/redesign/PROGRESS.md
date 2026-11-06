@@ -28,7 +28,7 @@ Last updated: 2026-11-06
 | Error, crash, reCAPTCHA, pickers and router | ErrorActivity.kt, ReCaptchaActivity.java, RouterActivity.java, picker helpers | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Special-purpose themes need explicit audit |
 | Notifications and widgets | player/download/feed notification sources and layouts | Not started | Not started | Not started | — | — | — | — | Not started | Keep notification channels and actions unchanged |
 | Responsive, RTL, accessibility and motion hardening | shared motion resources and all screen groups | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Not started | Requires device/emulator test matrix |
-| Final build, tests and report | Gradle tasks, screenshots, FINAL_REPORT.md | — | — | — | — | — | — | — | Not started | SDK/emulator unavailable in this session |
+| Final build, tests and report | Gradle tasks, screenshots, docs/redesign/FINAL_REPORT.md | — | — | — | — | — | — | — | In progress | Partial implementation report committed; build/test/runtime matrix not run because SDK/emulator/Gradle runner are unavailable |
 
 ## Verification log
 
