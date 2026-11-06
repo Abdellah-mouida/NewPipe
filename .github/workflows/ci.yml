@@ -140,40 +140,38 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run Android tests
+      - name: Run Android tests and smoke-test Android 8.1 startup
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: ${{ matrix.arch }}
+          api-level: \${{ matrix.api-level }}
+          target: \${{ matrix.target }}
+          arch: \${{ matrix.arch }}
           disable-animations: true
           script: |
+            set -euo pipefail
             ./gradlew --no-daemon connectedCheck --stacktrace
 
-      # connectedCheck alone does not guarantee that the app's main activity is
-      # launched. Explicitly open it on API 27 to catch Android 8.1 resource or
-      # activity-inflation regressions before the release job is allowed to run.
-      - name: Smoke-test app startup on Android 8.1
-        if: matrix.api-level == 27
-        shell: bash
-        run: |
-          set -euo pipefail
-          ./gradlew --no-daemon assembleContinuous --stacktrace
-          apk="$(find app/build/outputs/apk/continuous -maxdepth 1 -type f -name '*.apk' -print -quit)"
-          test -n "$apk"
-          package_name="$("$ANDROID_HOME/build-tools/37.0.0/aapt" dump badging "$apk" | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")"
-          test -n "$package_name"
-          adb install -r "$apk"
-          adb shell am force-stop "$package_name" || true
-          adb logcat -c
-          adb shell am start -W -n "$package_name/org.schabi.newpipe.MainActivity"
-          sleep 5
-          runtime_log="$(adb logcat -d -s AndroidRuntime:E)"
-          if grep -Eq "FATAL EXCEPTION|Unable to start activity|Error inflating class|Resources\\\$NotFoundException" <<< "$runtime_log"; then
-            echo "$runtime_log"
-            exit 1
-          fi
-          adb shell pidof "$package_name" >/dev/null
+            # API 27 is Android 8.1, the platform in the reported ACRA crash.
+            # Launch the real app while this emulator is still booted so resource
+            # inflation failures cannot slip through a compile-only CI run.
+            if [[ "\${{ matrix.api-level }}" == "27" ]]; then
+              ./gradlew --no-daemon assembleContinuous --stacktrace
+              apk="$(find app/build/outputs/apk/continuous -maxdepth 1 -type f -name '*.apk' -print -quit)"
+              test -n "$apk"
+              package_name="$("$ANDROID_HOME/build-tools/37.0.0/aapt" dump badging "$apk" | awk -F"'" '/^package: name=/{print $2; exit}')"
+              test -n "$package_name"
+              adb install -r "$apk"
+              adb shell am force-stop "$package_name" || true
+              adb logcat -c
+              adb shell am start -W -n "$package_name/org.schabi.newpipe.MainActivity"
+              sleep 5
+              runtime_log="$(adb logcat -d -s AndroidRuntime:E)"
+              if grep -Eq 'FATAL EXCEPTION|Unable to start activity|Error inflating class' <<< "$runtime_log"; then
+                echo "$runtime_log"
+                exit 1
+              fi
+              adb shell pidof "$package_name" >/dev/null
+            fi
 
       - name: Upload emulator test reports
         if: always()
