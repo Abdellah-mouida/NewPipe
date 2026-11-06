@@ -18,4 +18,28 @@
     <attr name="card_item_background_color" format="color" />
     <attr name="card_item_contrast_color" format="color" />
     <attr name="border_color" format="color" />
+    <attr name="npColorBackground" format="color" />
+    <attr name="npColorSurface1" format="color" />
+    <attr name="npColorSurface2" format="color" />
+    <attr name="npColorSurface3" format="color" />
+    <attr name="npColorOutline" format="color" />
+    <attr name="npColorOnSurface" format="color" />
+    <attr name="npColorOnSurfaceVariant" format="color" />
+    <attr name="npColorOnSurfaceSubtle" format="color" />
+    <attr name="npColorAccent" format="color" />
+    <attr name="npColorAccentContainer" format="color" />
+    <attr name="npColorOnAccent" format="color" />
+    <attr name="npColorAccentGradientStart" format="color" />
+    <attr name="npColorAccentGradientMid" format="color" />
+    <attr name="npColorAccentGradientEnd" format="color" />
+    <attr name="npColorScrim" format="color" />
+    <attr name="npColorGlass" format="color" />
+    <attr name="npColorGlassStroke" format="color" />
+    <attr name="npColorSuccess" format="color" />
+    <attr name="npColorWarning" format="color" />
+    <attr name="npColorError" format="color" />
+    <attr name="npColorLive" format="color" />
+    <attr name="npColorShimmerBase" format="color" />
+    <attr name="npColorShimmerHighlight" format="color" />
+    <attr name="npColorPlayerScrim" format="color" />
 </resources>

@@ -5,8 +5,9 @@
     android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:background="@drawable/np_video_card"
     android:clickable="true"
+    android:stateListAnimator="@animator/np_press_scale"
     android:focusable="true"
     android:minWidth="@dimen/channel_item_grid_min_width"
     android:padding="@dimen/channel_item_grid_padding">
@@ -30,7 +31,7 @@
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
         android:lines="1"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="@style/TextAppearance.Np.TitleSmall"
         android:textSize="@dimen/video_item_search_title_text_size"
         tools:ignore="RtlHardcoded"
         tools:text="Channel Title, Lorem ipsum" />
@@ -42,7 +43,7 @@
         android:layout_below="@id/itemTitleView"
         android:layout_centerHorizontal="true"
         android:lines="1"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="@style/TextAppearance.Np.BodySmall"
         android:textSize="@dimen/video_item_search_upload_date_text_size"
         tools:ignore="RtlHardcoded"
         tools:text="10M subscribers • 100 videos" />

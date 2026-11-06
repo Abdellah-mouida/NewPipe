@@ -10,7 +10,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/windowBackground"
+        android:elevation="0dp"
         android:gravity="center_vertical"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ToolbarTheme">
