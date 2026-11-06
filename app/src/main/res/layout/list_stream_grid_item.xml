@@ -6,10 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/np_video_card"
-    android:layout_margin="4dp"
+    android:layout_margin="8dp"
     android:clickable="true"
     android:stateListAnimator="@animator/np_press_scale"
     android:focusable="true"
+    android:elevation="4dp"
     android:padding="@dimen/video_item_search_padding">
 
     <ImageView

@@ -10,16 +10,17 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/main_tab_layout" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true" />
 
     <org.schabi.newpipe.views.ScrollableTabLayout
         android:id="@+id/main_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="68dp"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="14dp"
         android:layout_marginEnd="14dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/np_bottom_nav_background"
         android:elevation="16dp"
         android:paddingStart="4dp"
