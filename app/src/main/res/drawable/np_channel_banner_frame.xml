@@ -5,7 +5,6 @@
         android:type="linear"
         android:angle="0"
         android:startColor="?attr/npColorAccentContainer"
-        android:centerColor="?attr/npColorAccentGradientStart"
         android:endColor="?attr/npColorAccentGradientEnd" />
     <corners android:radius="@dimen/np_radius_lg" />
 </shape>

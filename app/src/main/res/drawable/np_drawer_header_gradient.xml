@@ -4,7 +4,6 @@
     <gradient
         android:angle="0"
         android:startColor="?attr/npColorAccentGradientStart"
-        android:centerColor="?attr/npColorAccentGradientMid"
         android:endColor="?attr/npColorAccentGradientEnd"
         android:type="linear" />
     <corners
