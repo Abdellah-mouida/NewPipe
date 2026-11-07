@@ -5,7 +5,7 @@
     android:id="@+id/video_item_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/windowBackground"
+    android:background="@drawable/np_player_detail_background"
     android:focusableInTouchMode="true">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -404,8 +404,13 @@
                         android:id="@+id/detail_control_panel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/np_action_panel_background"
+                        android:clipToOutline="true"
                         android:orientation="horizontal"
-                        android:padding="@dimen/detail_control_padding">
+                        android:padding="6dp">
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_playlist_append"
@@ -413,15 +418,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/add_to_playlist"
                             android:drawableTop="@drawable/ic_playlist_add"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/controls_add_to_playlist_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_background"
@@ -429,15 +436,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/play_audio"
                             android:drawableTop="@drawable/ic_headset"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/controls_background_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_popup"
@@ -445,15 +454,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/open_in_popup_mode"
                             android:drawableTop="@drawable/ic_picture_in_picture"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/controls_popup_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_download"
@@ -461,15 +472,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/controls_download_desc"
                             android:drawableTop="@drawable/ic_file_download"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/download"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                     </LinearLayout>
 
@@ -490,15 +503,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/share"
                             android:drawableTop="@drawable/ic_share"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/share"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_open_in_browser"
@@ -506,15 +521,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/open_in_browser"
                             android:drawableTop="@drawable/ic_language"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/open_in_browser"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_play_with_kodi"
@@ -522,15 +539,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/play_with_kodi_title"
                             android:drawableTop="@drawable/ic_cast"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/play_with_kodi_title"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                         <org.schabi.newpipe.views.NewPipeTextView
                             android:id="@+id/detail_controls_crash_the_player"
@@ -538,15 +557,17 @@
                             android:layout_height="@dimen/detail_control_height"
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:background="@drawable/np_action_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/crash_the_player"
                             android:drawableTop="@drawable/ic_bug_report"
+                            android:drawableTint="?attr/npColorAccent"
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingVertical="@dimen/detail_control_padding"
                             android:text="@string/crash_the_player"
-                            android:textSize="@dimen/detail_control_text_size" />
+                            android:textSize="@dimen/detail_control_text_size"
+                            android:textColor="?attr/npColorAccent" />
 
                     </LinearLayout>
 
@@ -588,13 +609,25 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            app:elevation="16dp"
-            app:tabBackground="?attr/windowBackground"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/np_bottom_nav_background"
+            android:clipToOutline="true"
+            android:elevation="16dp"
+            android:paddingHorizontal="4dp"
+            app:tabBackground="@drawable/np_channel_tab_background"
             app:tabGravity="fill"
-            app:tabIconTint="?attr/colorAccent"
-            app:tabIndicatorGravity="top" />
+            app:tabIconTint="?attr/npColorAccent"
+            app:tabIndicatorColor="@android:color/transparent"
+            app:tabIndicatorHeight="0dp"
+            app:tabMinHeight="48dp"
+            app:tabMode="fixed"
+            app:tabRippleColor="?attr/npColorAccentContainer"
+            app:tabSelectedTextColor="?attr/npColorAccent"
+            app:tabTextColor="?attr/npColorOnSurfaceVariant" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

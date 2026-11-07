@@ -5,10 +5,14 @@
     android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/np_comment_card_background"
     android:clickable="true"
     android:focusable="true"
-    android:padding="@dimen/comments_vertical_padding">
+    android:padding="12dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/itemThumbnailView"
@@ -20,6 +24,8 @@
         android:focusable="false"
         android:src="@drawable/placeholder_person"
         app:shapeAppearance="@style/CircularImageView"
+        app:strokeColor="?attr/npColorOutline"
+        app:strokeWidth="1dp"
         tools:ignore="RtlHardcoded" />
 
     <ImageView
@@ -41,6 +47,9 @@
         android:ellipsize="end"
         android:lines="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?attr/npColorOnSurface"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
         android:textSize="@dimen/comment_item_title_text_size"
         tools:text="Author Name, Lorem ipsum • 5 months ago" />
 
@@ -52,6 +61,8 @@
         android:layout_marginTop="6dp"
         android:layout_toEndOf="@+id/itemThumbnailView"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="?attr/npColorOnSurface"
+        android:lineSpacingExtra="2dp"
         android:textSize="@dimen/comment_item_content_text_size"
         tools:text="@tools:sample/lorem/random[1]" />
 
@@ -63,7 +74,8 @@
         android:layout_alignBottom="@+id/replies_button"
         android:layout_toEndOf="@+id/itemThumbnailView"
         android:contentDescription="@string/detail_likes_img_view_description"
-        android:src="@drawable/ic_thumb_up" />
+        android:src="@drawable/ic_thumb_up"
+        app:tint="?attr/npColorAccent" />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/detail_thumbs_up_count_view"
@@ -76,6 +88,7 @@
         android:gravity="center"
         android:lines="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?attr/npColorOnSurfaceVariant"
         android:textSize="@dimen/video_item_detail_likes_text_size"
         tools:text="12M" />
 
@@ -98,7 +111,16 @@
         android:layout_below="@id/itemCommentContentView"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/video_item_detail_heart_margin"
-        android:minHeight="0dp"
+        android:background="@drawable/np_action_button_background"
+        android:minWidth="0dp"
+        android:minHeight="32dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textAllCaps="false"
+        android:textColor="?attr/npColorAccent"
+        android:textSize="12sp"
         tools:text="543 replies" />
 
 </RelativeLayout>
