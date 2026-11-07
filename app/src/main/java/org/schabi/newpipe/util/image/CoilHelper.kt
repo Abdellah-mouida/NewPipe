@@ -3,6 +3,9 @@ package org.schabi.newpipe.util.image
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
@@ -77,8 +80,17 @@ object CoilHelper {
         target: ImageView,
         images: List<Image>
     ) {
+        loadThumbnailAnimated(target, images, null)
+    }
+
+    fun loadThumbnailAnimated(
+        target: ImageView,
+        images: List<Image>,
+        skeleton: View?
+    ) {
         val url = ImageStrategy.choosePreferredImage(images)
         if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
+            hideThumbnailSkeleton(skeleton)
             loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
             return
         }
@@ -101,8 +113,10 @@ object CoilHelper {
                     target.alpha = 1f
                     target.scaleX = 1f
                     target.scaleY = 1f
+                    startThumbnailSkeleton(skeleton)
                 },
                 onSuccess = { _, _ ->
+                    hideThumbnailSkeleton(skeleton)
                     target.animate().cancel()
                     target.alpha = 0f
                     target.scaleX = 0.985f
@@ -114,11 +128,36 @@ object CoilHelper {
                         .setDuration(280L)
                         .setInterpolator(DecelerateInterpolator())
                         .start()
+                },
+                onError = { _, _ ->
+                    hideThumbnailSkeleton(skeleton)
                 }
             )
             .build()
 
         target.context.imageLoader.enqueue(request)
+    }
+
+    private fun startThumbnailSkeleton(skeleton: View?) {
+        skeleton ?: return
+        skeleton.clearAnimation()
+        skeleton.alpha = 1f
+        skeleton.visibility = View.VISIBLE
+        skeleton.startAnimation(
+            AlphaAnimation(0.62f, 1f).apply {
+                duration = 850L
+                repeatMode = Animation.REVERSE
+                repeatCount = Animation.INFINITE
+                interpolator = DecelerateInterpolator()
+            }
+        )
+    }
+
+    private fun hideThumbnailSkeleton(skeleton: View?) {
+        skeleton ?: return
+        skeleton.clearAnimation()
+        skeleton.alpha = 1f
+        skeleton.visibility = View.GONE
     }
 
     fun loadScaledDownThumbnail(

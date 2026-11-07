@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class StreamMiniInfoItemHolder extends InfoItemHolder {
     public final ImageView itemThumbnailView;
+    private final View itemThumbnailSkeletonView;
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
@@ -33,6 +34,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         super(infoItemBuilder, layoutId, parent);
 
         itemThumbnailView = itemView.findViewById(R.id.itemThumbnailView);
+        itemThumbnailSkeletonView = itemView.findViewById(R.id.itemThumbnailSkeletonView);
         itemVideoTitleView = itemView.findViewById(R.id.itemVideoTitleView);
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
@@ -84,7 +86,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         }
 
         // Default thumbnail is shown on error, while loading and if the url is empty
-        CoilHelper.INSTANCE.loadThumbnailAnimated(itemThumbnailView, item.getThumbnails());
+        CoilHelper.INSTANCE.loadThumbnailAnimated(itemThumbnailView, item.getThumbnails(), itemThumbnailSkeletonView);
 
         itemView.setOnClickListener(view -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {
