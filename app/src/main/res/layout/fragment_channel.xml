@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/np_main_background">
+    android:background="@android:color/black">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -166,17 +166,21 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="12dp"
             android:background="@drawable/np_channel_tabs_background"
-            android:padding="4dp"
+            android:paddingHorizontal="4dp"
+            android:gravity="center_vertical"
             app:tabBackground="@drawable/np_channel_tab_background"
-            app:tabGravity="start"
+            app:tabGravity="center"
             app:tabIndicatorColor="@android:color/transparent"
             app:tabIndicatorHeight="0dp"
+            app:tabMinHeight="48dp"
             app:tabMinWidth="72dp"
             app:tabMode="scrollable"
             app:tabPaddingEnd="14dp"
             app:tabPaddingStart="14dp"
+            app:tabPaddingTop="0dp"
+            app:tabPaddingBottom="0dp"
             app:tabRippleColor="?attr/npColorGlassStroke"
-            app:tabSelectedTextColor="?attr/npColorOnAccent"
+            app:tabSelectedTextColor="?attr/npColorAccent"
             app:tabTextColor="?attr/npColorOnSurfaceVariant" />
 
         <androidx.viewpager.widget.ViewPager
