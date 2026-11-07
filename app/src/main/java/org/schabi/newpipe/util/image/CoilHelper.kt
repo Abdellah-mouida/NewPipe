@@ -3,6 +3,8 @@ package org.schabi.newpipe.util.image
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Animatable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -105,12 +107,12 @@ object CoilHelper {
         target.alpha = 1f
         target.scaleX = 1f
         target.scaleY = 1f
-        (target.drawable as? Animatable)?.stop()
+        findThumbnailAnimation(target.drawable)?.stop()
 
         if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
             hideThumbnailSkeleton(skeleton)
             target.setImageResource(R.drawable.placeholder_thumbnail_video)
-            (target.drawable as? Animatable)?.start()
+            findThumbnailAnimation(target.drawable)?.start()
             return
         }
 
@@ -130,11 +132,11 @@ object CoilHelper {
                     startThumbnailSkeleton(skeleton)
                     // Start after Coil installs its placeholder drawable.
                     target.post {
-                        (target.drawable as? Animatable)?.start()
+                        findThumbnailAnimation(target.drawable)?.start()
                     }
                 },
                 onSuccess = { _, _ ->
-                    (target.drawable as? Animatable)?.stop()
+                    findThumbnailAnimation(target.drawable)?.stop()
                     hideThumbnailSkeleton(skeleton)
                     target.animate().cancel()
                     target.alpha = 0f
@@ -151,13 +153,30 @@ object CoilHelper {
                 onError = { _, _ ->
                     hideThumbnailSkeleton(skeleton)
                     target.post {
-                        (target.drawable as? Animatable)?.start()
+                        findThumbnailAnimation(target.drawable)?.start()
                     }
                 }
             )
             .build()
 
         target.context.imageLoader.enqueue(request)
+    }
+
+    /**
+     * The thumbnail placeholder is a LayerDrawable containing an AnimatedVectorDrawable.
+     * Find the nested animation because LayerDrawable itself is not Animatable.
+     */
+    private fun findThumbnailAnimation(drawable: Drawable?): Animatable? {
+        drawable ?: return null
+        if (drawable is Animatable) {
+            return drawable
+        }
+        if (drawable is LayerDrawable) {
+            for (index in 0 until drawable.numberOfLayers) {
+                findThumbnailAnimation(drawable.getDrawable(index))?.let { return it }
+            }
+        }
+        return null
     }
 
     private fun startThumbnailSkeleton(skeleton: View?) {
