@@ -86,7 +86,10 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         }
 
         // Default thumbnail is shown on error, while loading and if the url is empty
-        CoilHelper.INSTANCE.loadThumbnailAnimated(itemThumbnailView, item.getThumbnails(), itemThumbnailSkeletonView);
+        CoilHelper.INSTANCE.loadThumbnailAnimated(
+                itemThumbnailView,
+                item.getThumbnails(),
+                itemThumbnailSkeletonView);
 
         itemView.setOnClickListener(view -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {

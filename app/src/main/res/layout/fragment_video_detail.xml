@@ -623,7 +623,6 @@
             app:tabIconTint="?attr/npColorAccent"
             app:tabIndicatorColor="@android:color/transparent"
             app:tabIndicatorHeight="0dp"
-            app:tabMinHeight="48dp"
             app:tabMode="fixed"
             app:tabRippleColor="?attr/npColorAccentContainer"
             app:tabSelectedTextColor="?attr/npColorAccent"

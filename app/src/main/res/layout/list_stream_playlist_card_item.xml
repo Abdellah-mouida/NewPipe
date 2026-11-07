@@ -12,19 +12,20 @@
     android:stateListAnimator="@animator/np_press_scale"
     android:focusable="true">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/itemThumbnailView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:background="@drawable/np_thumbnail_rounded"
-        android:clipToOutline="true"
         android:src="@drawable/placeholder_thumbnail_video"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="RtlHardcoded" />
+        tools:ignore="RtlHardcoded"         app:shapeAppearance="@style/ThumbnailImageView"
+        app:strokeColor="?attr/npColorOutline"
+        app:strokeWidth="0.5dp"
+    />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemDurationView"
