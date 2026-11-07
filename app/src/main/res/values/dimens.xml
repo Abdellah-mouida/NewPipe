@@ -94,8 +94,8 @@
     <dimen name="video_item_detail_error_panel_margin">50dp</dimen>
     <!-- Control panel -->
     <dimen name="detail_control_text_size">12sp</dimen>
-    <dimen name="detail_control_width">80dp</dimen>
-    <dimen name="detail_control_height">55dp</dimen>
+    <dimen name="detail_control_width">68dp</dimen>
+    <dimen name="detail_control_height">52dp</dimen>
     <dimen name="detail_control_padding">6dp</dimen>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>

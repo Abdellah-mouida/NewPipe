@@ -73,6 +73,7 @@
         android:layout_below="@id/itemCommentContentView"
         android:layout_alignBottom="@+id/replies_button"
         android:layout_toEndOf="@+id/itemThumbnailView"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/detail_likes_img_view_description"
         android:src="@drawable/ic_thumb_up"
         app:tint="?attr/npColorAccent" />
@@ -111,6 +112,7 @@
         android:layout_below="@id/itemCommentContentView"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/video_item_detail_heart_margin"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/np_action_button_background"
         android:minWidth="0dp"
         android:minHeight="32dp"

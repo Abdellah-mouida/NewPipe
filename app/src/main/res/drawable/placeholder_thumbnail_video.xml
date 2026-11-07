@@ -2,53 +2,13 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <gradient
-                android:angle="315"
-                android:startColor="#15172B"
-                android:centerColor="#1B2947"
-                android:endColor="#101A31" />
-            <corners android:radius="@dimen/np_radius_lg" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="150dp"
-                android:centerX="0.14"
-                android:centerY="0.08"
-                android:startColor="#705B5BFF"
-                android:endColor="#005B5BFF" />
-            <corners android:radius="@dimen/np_radius_lg" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:type="radial"
-                android:gradientRadius="130dp"
-                android:centerX="0.94"
-                android:centerY="0.94"
-                android:startColor="#503AA9F5"
-                android:endColor="#003AA9F5" />
+            <solid android:color="?attr/npColorShimmerBase" />
             <corners android:radius="@dimen/np_radius_lg" />
         </shape>
     </item>
     <item
-        android:width="48dp"
-        android:height="36dp"
-        android:gravity="center">
-        <shape android:shape="rectangle">
-            <solid android:color="#20FFFFFF" />
-            <corners android:radius="12dp" />
-            <stroke
-                android:width="1dp"
-                android:color="#52FFFFFF" />
-        </shape>
-    </item>
-    <item
-        android:width="18dp"
-        android:height="18dp"
+        android:width="24dp"
+        android:height="24dp"
         android:gravity="center"
-        android:drawable="@drawable/ic_play_arrow" />
+        android:drawable="@drawable/np_thumbnail_loading" />
 </layer-list>

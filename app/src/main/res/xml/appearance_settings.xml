@@ -13,16 +13,6 @@
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
 
-    <ListPreference
-        android:defaultValue="@string/default_night_theme_value"
-        android:entries="@array/night_theme_description_list"
-        android:entryValues="@array/night_theme_values_list"
-        android:key="@string/night_theme_key"
-        android:summary="@string/night_theme_summary"
-        android:title="@string/night_theme_title"
-        app:singleLineTitle="false"
-        app:iconSpaceReserved="false" />
-
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="@string/show_hold_to_append_key"

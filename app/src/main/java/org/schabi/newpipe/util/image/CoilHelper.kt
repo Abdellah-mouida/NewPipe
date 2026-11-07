@@ -2,6 +2,7 @@ package org.schabi.newpipe.util.image
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Animatable
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -59,14 +60,14 @@ object CoilHelper {
         target: ImageView,
         images: List<Image>
     ) {
-        loadImageDefault(target, images, R.drawable.placeholder_thumbnail_video)
+        loadThumbnailAnimated(target, images)
     }
 
     fun loadThumbnail(
         target: ImageView,
         url: String?
     ) {
-        loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
+        loadThumbnailAnimated(target, url, null)
     }
 
     /**
@@ -88,17 +89,30 @@ object CoilHelper {
         images: List<Image>,
         skeleton: View?
     ) {
-        val url = ImageStrategy.choosePreferredImage(images)
-        if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
-            hideThumbnailSkeleton(skeleton)
-            loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
-            return
-        }
+        loadThumbnailAnimated(
+            target,
+            ImageStrategy.choosePreferredImage(images),
+            skeleton
+        )
+    }
 
+    private fun loadThumbnailAnimated(
+        target: ImageView,
+        url: String?,
+        skeleton: View?
+    ) {
         target.animate().cancel()
         target.alpha = 1f
         target.scaleX = 1f
         target.scaleY = 1f
+        (target.drawable as? Animatable)?.stop()
+
+        if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
+            hideThumbnailSkeleton(skeleton)
+            target.setImageResource(R.drawable.placeholder_thumbnail_video)
+            (target.drawable as? Animatable)?.start()
+            return
+        }
 
         val request = getImageRequest(
             target.context,
@@ -114,8 +128,13 @@ object CoilHelper {
                     target.scaleX = 1f
                     target.scaleY = 1f
                     startThumbnailSkeleton(skeleton)
+                    // Start after Coil installs its placeholder drawable.
+                    target.post {
+                        (target.drawable as? Animatable)?.start()
+                    }
                 },
                 onSuccess = { _, _ ->
+                    (target.drawable as? Animatable)?.stop()
                     hideThumbnailSkeleton(skeleton)
                     target.animate().cancel()
                     target.alpha = 0f
@@ -131,6 +150,9 @@ object CoilHelper {
                 },
                 onError = { _, _ ->
                     hideThumbnailSkeleton(skeleton)
+                    target.post {
+                        (target.drawable as? Animatable)?.start()
+                    }
                 }
             )
             .build()
