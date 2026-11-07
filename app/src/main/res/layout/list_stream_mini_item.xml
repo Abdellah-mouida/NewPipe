@@ -14,7 +14,9 @@
     android:stateListAnimator="@animator/np_press_scale"
     android:focusable="true"
     android:elevation="2dp"
-    a<com.google.android.material.imageview.ShapeableImageView
+    android:padding="@dimen/video_item_search_padding">
+
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/itemThumbnailView"
         android:layout_width="98dp"
         android:layout_height="55dp"
@@ -24,10 +26,10 @@
         android:layout_marginRight="@dimen/video_item_search_image_right_margin"
         android:scaleType="centerCrop"
         android:src="@drawable/placeholder_thumbnail_video"
-        tools:ignore="RtlHardcoded"         app:shapeAppearance="@style/ThumbnailImageView"
+        app:shapeAppearance="@style/ThumbnailImageView"
         app:strokeColor="?attr/npColorOutline"
         app:strokeWidth="0.5dp"
-    />
+        tools:ignore="RtlHardcoded" />
 
     <View
         android:id="@+id/itemThumbnailSkeletonView"
@@ -37,8 +39,7 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/np_thumbnail_skeleton"
         android:importantForAccessibility="no"
-        android:visibility="visible" />_thumbnail_video"
-        tools:ignore="RtlHardcoded" />
+        android:visibility="visible" />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemDurationView"
