@@ -18,7 +18,7 @@
                 android:id="@+id/fragment_holder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="68dp" />
+                android:layout_marginTop="0dp" />
 
         </eightbitlab.com.blurview.BlurTarget>
 

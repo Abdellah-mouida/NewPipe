@@ -5,7 +5,10 @@
     android:id="@+id/itemRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="18dp"
     android:background="@android:color/transparent"
     android:clickable="true"
     android:focusable="true"
@@ -16,14 +19,15 @@
         android:id="@+id/itemVideoTitleView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:ellipsize="end"
         android:maxLines="2"
         android:textAppearance="@style/TextAppearance.Np.TitleSmall"
         android:textSize="@dimen/video_item_search_title_text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
         tools:text="@tools:sample/lorem[10]" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -35,7 +39,7 @@
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
+        app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/ThumbnailImageView"
         app:strokeColor="?attr/npColorOutline"
         app:strokeWidth="0.5dp" />
@@ -83,7 +87,7 @@
         android:id="@+id/itemUploaderView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="7dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:lines="1"
@@ -91,13 +95,14 @@
         android:textSize="@dimen/video_item_search_uploader_text_size"
         app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
         app:layout_constraintStart_toStartOf="@id/itemThumbnailView"
-        app:layout_constraintTop_toBottomOf="@id/itemThumbnailView"
+        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
         tools:text="Uploader name long very very long long" />
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemAdditionalDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:lines="1"

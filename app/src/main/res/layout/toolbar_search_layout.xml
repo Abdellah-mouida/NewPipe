@@ -7,9 +7,7 @@
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
     android:layout_marginEnd="8dp"
-    android:background="@drawable/np_search_bar_background"
-    android:clipToOutline="true"
-    android:outlineProvider="background"
+    android:background="@android:color/transparent"
     tools:background="?attr/colorPrimary">
 
     <org.schabi.newpipe.views.NewPipeEditText

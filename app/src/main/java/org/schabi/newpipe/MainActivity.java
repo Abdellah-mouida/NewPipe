@@ -944,8 +944,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupFloatingToolbarBlur() {
         final int glassColor = ThemeHelper.resolveColorFromAttr(this, R.attr.npColorGlass);
         toolbarLayoutBinding.toolbarBlur.setupWith(mainBinding.toolbarBlurTarget)
-                .setBlurRadius(22f)
-                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 142));
+                .setBlurRadius(26f)
+                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 108));
         toolbarLayoutBinding.toolbarBlur.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
         toolbarLayoutBinding.toolbarBlur.setClipToOutline(true);
         toolbarLayoutBinding.toolbar.setBackgroundColor(Color.TRANSPARENT);
