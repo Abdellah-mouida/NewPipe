@@ -7,8 +7,6 @@
 
 package org.schabi.newpipe.player.datasource;
 
-import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS;
-import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS;
 import static com.google.android.exoplayer2.upstream.HttpUtil.buildRangeRequestHeader;
 import static com.google.android.exoplayer2.util.Assertions.checkNotNull;
 import static com.google.android.exoplayer2.util.Util.castNonNull;
@@ -51,6 +49,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -100,8 +99,9 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
          */
         public Factory() {
             defaultRequestProperties = new RequestProperties();
-            connectTimeoutMs = DEFAULT_CONNECT_TIMEOUT_MILLIS;
-            readTimeoutMs = DEFAULT_READ_TIMEOUT_MILLIS;
+            // YouTube media servers can be slow to establish a route on some mobile networks.
+            connectTimeoutMs = 15_000;
+            readTimeoutMs = 25_000;
         }
 
         @NonNull
@@ -116,7 +116,7 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
          * Sets the connect timeout, in milliseconds.
          *
          * <p>
-         * The default is {@link DefaultHttpDataSource#DEFAULT_CONNECT_TIMEOUT_MILLIS}.
+         * The default is 15 seconds to tolerate slow YouTube media-server routes.
          * </p>
          *
          * @param connectTimeoutMsValue The connect timeout, in milliseconds, that will be used.
@@ -130,7 +130,7 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
         /**
          * Sets the read timeout, in milliseconds.
          *
-         * <p>The default is {@link DefaultHttpDataSource#DEFAULT_READ_TIMEOUT_MILLIS}.
+         * <p>The default is 25 seconds to tolerate slower media connections.
          *
          * @param readTimeoutMsValue The connect timeout, in milliseconds, that will be used.
          * @return This factory.
@@ -261,6 +261,7 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
 
     private static final String TAG = YoutubeHttpDataSource.class.getSimpleName();
     private static final int MAX_REDIRECTS = 20; // Same limit as okhttp.
+    private static final int MAX_CONNECT_RETRIES = 1;
     private static final int HTTP_STATUS_TEMPORARY_REDIRECT = 307;
     private static final int HTTP_STATUS_PERMANENT_REDIRECT = 308;
     private static final long MAX_BYTES_TO_DRAIN = 2048;
@@ -615,6 +616,22 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
             final boolean allowGzip,
             final boolean followRedirects,
             final Map<String, String> requestParameters) throws IOException {
+        return makeConnection(url, httpMethod, httpBody, position, length, allowGzip,
+                followRedirects, requestParameters, 0);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    @NonNull
+    private HttpURLConnection makeConnection(
+            @NonNull final URL url,
+            @HttpMethod final int httpMethod,
+            @Nullable final byte[] httpBody,
+            final long position,
+            final long length,
+            final boolean allowGzip,
+            final boolean followRedirects,
+            final Map<String, String> requestParameters,
+            final int connectRetryCount) throws IOException {
         // This is the method that contains breaking changes with respect to DefaultHttpDataSource!
 
         String requestUrl = url.toString();
@@ -681,7 +698,17 @@ public final class YoutubeHttpDataSource extends BaseDataSource implements HttpD
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setDoOutput(true);
         httpURLConnection.setFixedLengthStreamingMode(POST_BODY.length);
-        httpURLConnection.connect();
+        try {
+            httpURLConnection.connect();
+        } catch (final SocketTimeoutException e) {
+            httpURLConnection.disconnect();
+            if (connectRetryCount >= MAX_CONNECT_RETRIES) {
+                throw e;
+            }
+            Log.w(TAG, "YouTube media connection timed out; retrying once", e);
+            return makeConnection(url, httpMethod, httpBody, position, length, allowGzip,
+                    followRedirects, requestParameters, connectRetryCount + 1);
+        }
 
         final OutputStream os = httpURLConnection.getOutputStream();
         os.write(POST_BODY);

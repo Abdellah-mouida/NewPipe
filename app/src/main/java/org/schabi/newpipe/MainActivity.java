@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -51,6 +53,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbarLayoutBinding.toolbar);
+        setupFloatingToolbarBlur();
         try {
             setupDrawer();
         } catch (final Exception e) {
@@ -935,6 +939,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (final Exception e) {
             ErrorUtil.showUiErrorSnackbar(this, "Handling intent", e);
         }
+    }
+
+    private void setupFloatingToolbarBlur() {
+        final int glassColor = ThemeHelper.resolveColorFromAttr(this, R.attr.npColorGlass);
+        toolbarLayoutBinding.toolbarBlur.setupWith(mainBinding.toolbarBlurTarget)
+                .setBlurRadius(22f)
+                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 142));
+        toolbarLayoutBinding.toolbarBlur.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        toolbarLayoutBinding.toolbarBlur.setClipToOutline(true);
+        toolbarLayoutBinding.toolbar.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void openMiniPlayerIfMissing() {
