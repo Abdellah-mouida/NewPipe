@@ -5,6 +5,7 @@ on:
     branches:
       - dev
       - master
+      - premium
       - 'redesign/**'
     # The release job bumps only this file after publishing. Do not start a
     # second CI/release cycle for that bot-generated version-only commit.
@@ -16,6 +17,7 @@ on:
       - dev
       - master
       - refactor
+      - premium
       - 'release**'
 
   workflow_dispatch:
