@@ -1,6 +1,7 @@
 package org.schabi.newpipe.info_list.holder;
 
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -38,6 +39,8 @@ import org.schabi.newpipe.util.Localization;
 
 public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
     public final TextView itemAdditionalDetails;
+    private final TextView itemViewCountText;
+    private final View itemViewCountIcon;
 
     public StreamInfoItemHolder(final InfoItemBuilder infoItemBuilder, final ViewGroup parent) {
         this(infoItemBuilder, R.layout.list_stream_item, parent);
@@ -47,6 +50,8 @@ public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
                                 final ViewGroup parent) {
         super(infoItemBuilder, layoutId, parent);
         itemAdditionalDetails = itemView.findViewById(R.id.itemAdditionalDetails);
+        itemViewCountText = itemView.findViewById(R.id.itemViewCountText);
+        itemViewCountIcon = itemView.findViewById(R.id.itemViewCountIcon);
     }
 
     @Override
@@ -59,35 +64,36 @@ public class StreamInfoItemHolder extends StreamMiniInfoItemHolder {
         }
         final StreamInfoItem item = (StreamInfoItem) infoItem;
 
-        itemAdditionalDetails.setText(getStreamInfoDetailLine(item));
-    }
-
-    private String getStreamInfoDetailLine(final StreamInfoItem infoItem) {
-        String viewsAndDate = "";
-        if (infoItem.getViewCount() >= 0) {
-            if (infoItem.getStreamType().equals(StreamType.AUDIO_LIVE_STREAM)) {
-                viewsAndDate = Localization
-                        .listeningCount(itemBuilder.getContext(), infoItem.getViewCount());
-            } else if (infoItem.getStreamType().equals(StreamType.LIVE_STREAM)) {
-                viewsAndDate = Localization
-                        .shortWatchingCount(itemBuilder.getContext(), infoItem.getViewCount());
-            } else {
-                viewsAndDate = Localization
-                        .shortViewCount(itemBuilder.getContext(), infoItem.getViewCount());
-            }
+        final String viewCount = getViewCountLine(item);
+        if (itemViewCountText != null) {
+            final boolean hasViewCount = !TextUtils.isEmpty(viewCount);
+            itemViewCountText.setVisibility(hasViewCount ? View.VISIBLE : View.GONE);
+            itemViewCountText.setText(viewCount);
+        }
+        if (itemViewCountIcon != null) {
+            itemViewCountIcon.setVisibility(
+                    TextUtils.isEmpty(viewCount) ? View.GONE : View.VISIBLE);
         }
 
         final String uploadDate = Localization.relativeTimeOrTextual(itemBuilder.getContext(),
-                infoItem.getUploadDate(),
-                infoItem.getTextualUploadDate());
-        if (!TextUtils.isEmpty(uploadDate)) {
-            if (viewsAndDate.isEmpty()) {
-                return uploadDate;
-            }
+                item.getUploadDate(), item.getTextualUploadDate());
+        itemAdditionalDetails.setText(uploadDate);
+        itemAdditionalDetails.setVisibility(
+                TextUtils.isEmpty(uploadDate) ? View.GONE : View.VISIBLE);
+    }
 
-            return Localization.concatenateStrings(viewsAndDate, uploadDate);
+    private String getViewCountLine(final StreamInfoItem infoItem) {
+        if (infoItem.getViewCount() < 0) {
+            return "";
         }
-
-        return viewsAndDate;
+        if (infoItem.getStreamType().equals(StreamType.AUDIO_LIVE_STREAM)) {
+            return Localization.listeningCount(itemBuilder.getContext(),
+                    infoItem.getViewCount());
+        }
+        if (infoItem.getStreamType().equals(StreamType.LIVE_STREAM)) {
+            return Localization.shortWatchingCount(itemBuilder.getContext(),
+                    infoItem.getViewCount());
+        }
+        return Localization.shortViewCount(itemBuilder.getContext(), infoItem.getViewCount());
     }
 }

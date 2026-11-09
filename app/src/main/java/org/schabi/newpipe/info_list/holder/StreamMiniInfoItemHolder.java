@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class StreamMiniInfoItemHolder extends InfoItemHolder {
     public final ImageView itemThumbnailView;
     private final View itemThumbnailSkeletonView;
+    private final ImageView itemUploaderAvatarView;
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
@@ -35,6 +36,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         itemThumbnailView = itemView.findViewById(R.id.itemThumbnailView);
         itemThumbnailSkeletonView = itemView.findViewById(R.id.itemThumbnailSkeletonView);
+        itemUploaderAvatarView = itemView.findViewById(R.id.itemUploaderAvatarView);
         itemVideoTitleView = itemView.findViewById(R.id.itemVideoTitleView);
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
@@ -55,6 +57,9 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         itemVideoTitleView.setText(item.getName());
         itemUploaderView.setText(item.getUploaderName());
+        if (itemUploaderAvatarView != null) {
+            CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, item.getUploaderAvatars());
+        }
 
         if (item.getDuration() > 0) {
             itemDurationView.setText(Localization.getDurationString(item.getDuration()));

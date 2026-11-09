@@ -84,34 +84,79 @@
         app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
         app:layout_constraintStart_toStartOf="@id/itemThumbnailView" />
 
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/itemUploaderView"
+    <LinearLayout
+        android:id="@+id/itemUploaderInfoRow"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="0dp"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:lines="1"
-        android:textAppearance="@style/TextAppearance.Np.BodySmall"
-        app:layout_constraintEnd_toEndOf="@id/itemVideoTitleView"
-        app:layout_constraintStart_toStartOf="@id/itemVideoTitleView"
-        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView"
-        tools:text="Uploader" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemVideoTitleView">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/itemUploaderAvatarView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_person"
+            app:shapeAppearance="@style/CircularImageView"
+            app:strokeColor="?attr/npColorOutline"
+            app:strokeWidth="0.5dp" />
+
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:id="@+id/itemUploaderView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Np.BodySmall"
+            tools:text="Uploader" />
+
+        <ImageView
+            android:id="@+id/itemViewCountIcon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@null"
+            android:src="@drawable/np_ic_views"
+            app:tint="?attr/npColorOnSurfaceVariant" />
+
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:id="@+id/itemViewCountText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Np.BodySmall"
+            android:textColor="?attr/npColorOnSurfaceVariant"
+            tools:text="4.8B views" />
+
+    </LinearLayout>
+
+
 
     <org.schabi.newpipe.views.NewPipeTextView
         android:id="@+id/itemAdditionalDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:ellipsize="end"
+        android:layout_marginTop="3dp"
+        android:gravity="end"
         android:includeFontPadding="false"
-        android:lines="1"
+        android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Np.BodySmall"
+        android:textColor="?attr/npColorOnSurfaceSubtle"
+        android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/itemVideoTitleView"
-        app:layout_constraintStart_toStartOf="@id/itemVideoTitleView"
-        app:layout_constraintTop_toBottomOf="@id/itemUploaderView"
-        tools:text="2 years ago • 10M views" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemUploaderInfoRow"
+        tools:text="8 years ago" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

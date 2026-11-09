@@ -42,6 +42,7 @@
                     android:adjustViewBounds="false"
                     android:background="@drawable/np_channel_banner_frame"
                     android:clipToOutline="true"
+                    android:outlineProvider="background"
                     android:scaleType="centerCrop"
                     android:src="@drawable/placeholder_channel_banner"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -56,14 +57,14 @@
                     android:layout_height="76dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="18dp"
-                    android:elevation="8dp"
+                    android:elevation="4dp"
                     android:padding="1dp"
                     android:src="@drawable/placeholder_person"
                     app:layout_constraintBottom_toTopOf="@id/channel_subscribe_button"
                     app:layout_constraintStart_toStartOf="parent"
                     app:shapeAppearance="@style/CircularImageView"
-                    app:strokeColor="?attr/npColorAccent"
-                    app:strokeWidth="3dp"
+                    app:strokeColor="#FF000000"
+                    app:strokeWidth="1dp"
                     app:tint="@null" />
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -76,8 +77,8 @@
                     app:layout_constraintBottom_toBottomOf="@id/channel_avatar_view"
                     app:layout_constraintEnd_toEndOf="@id/channel_avatar_view"
                     app:shapeAppearance="@style/CircularImageView"
-                    app:strokeColor="?attr/npColorAccentGradientEnd"
-                    app:strokeWidth="2dp"
+                    app:strokeColor="#FF000000"
+                    app:strokeWidth="1dp"
                     app:tint="@null"
                     tools:visibility="visible" />
 
@@ -138,7 +139,7 @@
                     android:layout_marginBottom="2dp"
                     android:background="@drawable/np_channel_subscribe_background"
                     android:backgroundTint="@null"
-                    android:elevation="3dp"
+                    android:elevation="6dp"
                     android:minHeight="42dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
