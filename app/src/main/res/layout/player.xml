@@ -581,7 +581,7 @@
                 android:id="@+id/playPauseButton"
                 android:layout_width="52dp"
                 android:layout_height="52dp"
-                android:background="@android:color/transparent"
+                android:background="@null"
                 android:contentDescription="@string/pause"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_pause"

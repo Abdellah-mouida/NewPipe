@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -274,7 +273,6 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
     protected void setupElementsVisibility() {
         super.setupElementsVisibility();
 
-        updatePlayerCornerClipping();
         closeItemsList();
         showHideKodiButton();
         binding.fullScreenButton.setVisibility(View.GONE);
@@ -911,17 +909,6 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         setupScreenRotationButton();
     }
 
-    private void updatePlayerCornerClipping() {
-        if (isFullscreen) {
-            binding.getRoot().setClipToOutline(false);
-            binding.getRoot().setBackgroundColor(Color.BLACK);
-        } else {
-            binding.getRoot().setBackgroundResource(R.drawable.np_mini_player_background);
-            binding.getRoot().setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-            binding.getRoot().setClipToOutline(true);
-        }
-    }
-
     public void toggleFullscreen() {
         if (DEBUG) {
             Log.d(TAG, "toggleFullscreen() called");
@@ -933,7 +920,6 @@ public final class MainPlayerUi extends VideoPlayerUi implements View.OnLayoutCh
         }
 
         isFullscreen = !isFullscreen;
-        updatePlayerCornerClipping();
         if (isFullscreen) {
             // Android needs tens milliseconds to send new insets but a user is able to see
             // how controls changes it's position from `0` to `nav bar height` padding.

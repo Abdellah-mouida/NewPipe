@@ -139,25 +139,22 @@
             android:textColor="?attr/npColorOnSurfaceVariant"
             tools:text="4.8B" />
 
+        <org.schabi.newpipe.views.NewPipeTextView
+            android:id="@+id/itemAdditionalDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:ellipsize="end"
+            android:maxWidth="46dp"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?attr/npColorOnSurfaceVariant"
+            android:textSize="8sp"
+            tools:text="7 years ago" />
     </LinearLayout>
 
 
 
-    <org.schabi.newpipe.views.NewPipeTextView
-        android:id="@+id/itemAdditionalDetails"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:gravity="end"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?attr/npColorOnSurfaceSubtle"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/itemThumbnailView"
-        app:layout_constraintStart_toStartOf="@id/itemThumbnailView"
-        app:layout_constraintTop_toBottomOf="@id/itemUploaderInfoRow"
-        tools:text="8 years ago" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
