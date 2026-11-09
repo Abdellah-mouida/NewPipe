@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.navigation.NavigationView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/navigation"
     android:layout_width="304dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
@@ -10,9 +9,36 @@
     android:layout_marginBottom="8dp"
     android:background="@drawable/np_drawer_background"
     android:clipToOutline="true"
-    android:orientation="vertical"
-    app:headerLayout="@layout/drawer_header"
-    app:itemBackground="@drawable/np_drawer_item_background"
-    app:itemHorizontalPadding="18dp"
-    app:itemIconTint="@color/np_drawer_item_tint"
-    app:itemTextColor="@color/np_drawer_item_tint" />
+    android:orientation="vertical">
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        app:headerLayout="@layout/drawer_header"
+        app:itemBackground="@drawable/np_drawer_item_background"
+        app:itemHorizontalPadding="18dp"
+        app:itemIconTint="@color/np_drawer_item_tint"
+        app:itemTextColor="@color/np_drawer_item_tint" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:background="#1FFFFFFF" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="13dp"
+        android:paddingBottom="13dp"
+        android:text="@string/made_by_abdellah_mouida"
+        android:textColor="#8CFFFFFF"
+        android:textSize="13sp" />
+
+</LinearLayout>
