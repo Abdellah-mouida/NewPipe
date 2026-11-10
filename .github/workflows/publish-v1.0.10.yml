@@ -129,22 +129,44 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           if [[ "$PRERELEASE" == "true" ]]; then
-            gh release create v1.0.10 release-assets/* \
-              --repo "$GITHUB_REPOSITORY" \
-              --title "NewPipe v1.0.10" \
-              --prerelease \
-              --latest=false \
-              --notes "Unofficial NewPipe UI fork release 1.0.10.
+            cat > release-notes.md <<'NOTES'
+          Unofficial NewPipe UI fork release 1.0.10.
 
-          This package was built with the Continuous variant and is debug-signed because production signing secrets were not configured. Android may require uninstalling another NewPipe build before installing it. The source ZIP and SHA256 checksums are attached."
+          This package was built with the Continuous variant and is debug-signed because production signing secrets were not configured. Android may require uninstalling another NewPipe build before installing it. The source ZIP and SHA256 checksums are attached.
+          NOTES
           else
-            gh release create v1.0.10 release-assets/* \
-              --repo "$GITHUB_REPOSITORY" \
-              --title "NewPipe v1.0.10" \
-              --notes "Unofficial NewPipe UI fork release 1.0.10.
+            cat > release-notes.md <<'NOTES'
+          Unofficial NewPipe UI fork release 1.0.10.
 
-          Production-signed APK and AAB. The source ZIP and SHA256 checksums are attached."
+          Production-signed APK and AAB. The source ZIP and SHA256 checksums are attached.
+          NOTES
+          fi
+
+          if gh release view v1.0.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.0.10 \\
+              --repo "$GITHUB_REPOSITORY" \\
+              --target "$GITHUB_SHA" \\
+              --title "NewPipe v1.0.10" \\
+              --notes-file release-notes.md
+            gh release upload v1.0.10 release-assets/* \\
+              --repo "$GITHUB_REPOSITORY" \\
+              --clobber
+          elif [[ "$PRERELEASE" == "true" ]]; then
+            gh release create v1.0.10 release-assets/* \\
+              --repo "$GITHUB_REPOSITORY" \\
+              --target "$GITHUB_SHA" \\
+              --title "NewPipe v1.0.10" \\
+              --prerelease \\
+              --latest=false \\
+              --notes-file release-notes.md
+          else
+            gh release create v1.0.10 release-assets/* \\
+              --repo "$GITHUB_REPOSITORY" \\
+              --target "$GITHUB_SHA" \\
+              --title "NewPipe v1.0.10" \\
+              --notes-file release-notes.md
           fi
 
       - name: Upload release assets as workflow artifacts
