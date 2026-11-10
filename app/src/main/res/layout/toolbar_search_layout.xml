@@ -15,7 +15,8 @@
     <org.schabi.newpipe.views.NewPipeEditText
         android:id="@+id/toolbar_search_edit_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="48dp"
+        android:minHeight="48dp"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
