@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -209,6 +210,11 @@ public class SettingsActivity extends AppCompatActivity implements
 
         // Configure input field for search
         searchEditText = searchContainer.findViewById(R.id.toolbar_search_edit_text);
+        searchEditText.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        searchEditText.setIncludeFontPadding(false);
+        searchEditText.setPaddingRelative(
+                searchEditText.getPaddingStart(), 0, searchEditText.getPaddingEnd(), 0);
+        searchEditText.setSingleLine(true);
         RxTextView.textChanges(searchEditText)
                 // Wait some time after the last input before actually searching
                 .debounce(200, TimeUnit.MILLISECONDS)
