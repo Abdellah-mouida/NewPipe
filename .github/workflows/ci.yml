@@ -168,7 +168,7 @@ jobs:
   publish-stable:
     name: Publish signed release and bump next version
     needs: [build, android-tests]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/redesign/premium-ui' && needs.build.result == 'success' && needs.android-tests.result == 'success'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/premium' && needs.build.result == 'success' && needs.android-tests.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
@@ -317,7 +317,7 @@ jobs:
               --latest \
               --notes "Stable release of the NewPipe redesign fork.
 
-          - Source branch: redesign/premium-ui
+          - Source branch: premium
           - Tested commit: $GITHUB_SHA
           - CI build, lint, unit tests, and both Android emulator test jobs passed.
           - APK and AAB are signed with this fork's release key.
