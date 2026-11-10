@@ -31,11 +31,11 @@
     <color name="np_dark_on_surface">#F2F4F8</color>
     <color name="np_dark_on_surface_variant">#A3AABB</color>
     <color name="np_dark_on_surface_subtle">#7D8599</color>
-    <color name="np_dark_accent">#70AFFF</color>
-    <color name="np_dark_accent_container">#141C4A75</color>
-    <color name="np_dark_on_accent">#07111F</color>
-    <color name="np_dark_gradient_mid">#8ABEFF</color>
-    <color name="np_dark_gradient_end">#60CDE4</color>
+    <color name="np_dark_accent">#5B9BFF</color>
+    <color name="np_dark_accent_container">#102647</color>
+    <color name="np_dark_on_accent">#FFFFFF</color>
+    <color name="np_dark_gradient_mid">#5B8CFF</color>
+    <color name="np_dark_gradient_end">#22D3EE</color>
     <color name="np_dark_glass">#E61B1F2A</color>
     <color name="np_dark_glass_stroke">#1AFFFFFF</color>
     <color name="np_dark_ripple">#24FFFFFF</color>
@@ -53,11 +53,11 @@
     <color name="np_amoled_on_surface">#FFFFFF</color>
     <color name="np_amoled_on_surface_variant">#9CA3B4</color>
     <color name="np_amoled_on_surface_subtle">#7A8296</color>
-    <color name="np_amoled_accent">#70AFFF</color>
-    <color name="np_amoled_accent_container">#141C4A75</color>
-    <color name="np_amoled_on_accent">#07111F</color>
-    <color name="np_amoled_gradient_mid">#8ABEFF</color>
-    <color name="np_amoled_gradient_end">#60CDE4</color>
+    <color name="np_amoled_accent">#4C9BFF</color>
+    <color name="np_amoled_accent_container">#0B2340</color>
+    <color name="np_amoled_on_accent">#FFFFFF</color>
+    <color name="np_amoled_gradient_mid">#62A0FF</color>
+    <color name="np_amoled_gradient_end">#2BE0F5</color>
     <color name="np_amoled_glass">#EB0F1115</color>
     <color name="np_amoled_glass_stroke">#1FFFFFFF</color>
     <color name="np_amoled_shimmer_base">#0F1115</color>
@@ -73,25 +73,25 @@
     <color name="np_duration_scrim">#B8000000</color>
 
     <!-- Accent palette (shared by Dark and AMOLED themes) -->
-    <color name="np_accent_blue">#70AFFF</color>
-    <color name="np_accent_blue_container">#141C4A75</color>
-    <color name="np_accent_blue_mid">#8ABEFF</color>
-    <color name="np_accent_blue_end">#528FE8</color>
+    <color name="np_accent_blue">#2563EB</color>
+    <color name="np_accent_blue_container">#10264A</color>
+    <color name="np_accent_blue_mid">#3B82F6</color>
+    <color name="np_accent_blue_end">#1D4ED8</color>
 
-    <color name="np_accent_violet">#B49AFF</color>
-    <color name="np_accent_violet_container">#141F3D78</color>
-    <color name="np_accent_violet_mid">#C8B6FF</color>
-    <color name="np_accent_violet_end">#9270EA</color>
+    <color name="np_accent_violet">#6D28D9</color>
+    <color name="np_accent_violet_container">#2E1065</color>
+    <color name="np_accent_violet_mid">#8B5CF6</color>
+    <color name="np_accent_violet_end">#5B21B6</color>
 
-    <color name="np_accent_red">#FF858B</color>
-    <color name="np_accent_red_container">#143E252A</color>
-    <color name="np_accent_red_mid">#FFA0A5</color>
-    <color name="np_accent_red_end">#E56D74</color>
+    <color name="np_accent_red">#DC2626</color>
+    <color name="np_accent_red_container">#450A0A</color>
+    <color name="np_accent_red_mid">#EF4444</color>
+    <color name="np_accent_red_end">#991B1B</color>
 
-    <color name="np_accent_green">#70DFA0</color>
-    <color name="np_accent_green_container">#14214C38</color>
-    <color name="np_accent_green_mid">#9BEABD</color>
-    <color name="np_accent_green_end">#4FC889</color>
-    <color name="np_accent_on">#07111F</color>
+    <color name="np_accent_green">#15803D</color>
+    <color name="np_accent_green_container">#052E16</color>
+    <color name="np_accent_green_mid">#16A34A</color>
+    <color name="np_accent_green_end">#166534</color>
+    <color name="np_accent_on">#FFFFFF</color>
 
 </resources>

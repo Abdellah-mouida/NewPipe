@@ -280,8 +280,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareDrawerEntrance() {
-        // Keep the drawer surface stable. Hide only its contents before the first
-        // animation frame so menu rows cannot flash in at full opacity.
+        // Start the floating drawer panel slightly scaled down and translucent.
+        // applyDrawerEntranceProgress ties the finishing animation to the drawer gesture.
+        final View drawerSurface = drawerLayoutBinding.navigation;
+        drawerSurface.animate().cancel();
+        drawerSurface.setAlpha(0.90f);
+        drawerSurface.setPivotX(drawerSurface.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
+                ? drawerSurface.getWidth() : 0f);
+        drawerSurface.setPivotY(drawerSurface.getHeight() / 2f);
+        drawerSurface.setScaleX(0.975f);
+        drawerSurface.setScaleY(0.985f);
+
+        // Keep the drawer contents hidden before the first animation frame so menu rows
+        // cannot flash in at full opacity.
         drawerHeaderBinding.getRoot().animate().cancel();
         drawerHeaderBinding.getRoot().setAlpha(0f);
         drawerHeaderBinding.getRoot().setTranslationY(-dp(10));
@@ -301,6 +312,14 @@ public class MainActivity extends AppCompatActivity {
         final float progress = Math.max(0f, Math.min(1f, rawProgress));
         // Smoothstep follows the user's drag/open gesture from the first frame.
         final float easedProgress = progress * progress * (3f - 2f * progress);
+
+        final View drawerSurface = drawerLayoutBinding.navigation;
+        drawerSurface.setPivotX(drawerSurface.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
+                ? drawerSurface.getWidth() : 0f);
+        drawerSurface.setPivotY(drawerSurface.getHeight() / 2f);
+        drawerSurface.setAlpha(0.90f + (0.10f * easedProgress));
+        drawerSurface.setScaleX(0.975f + (0.025f * easedProgress));
+        drawerSurface.setScaleY(0.985f + (0.015f * easedProgress));
 
         final View header = drawerHeaderBinding.getRoot();
         header.setAlpha(easedProgress);
@@ -476,6 +495,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDrawerHeader() {
         drawerHeaderBinding.drawerHeaderActionButton.setOnClickListener(view -> toggleServices());
+        drawerHeaderBinding.drawerHeaderCloseButton
+                .setOnClickListener(view -> mainBinding.getRoot().closeDrawers());
 
         // If the current app name is bigger than the default "NewPipe" (7 chars),
         // let the text view grow a little more as well.
