@@ -82,6 +82,8 @@ public final class ThemeHelper {
     /**
      * Applies the appearance theme plus the user's selected accent to the settings activity.
      * Call this before the activity's super.onCreate().
+     *
+     * @param context the settings activity that receives the selected theme
      */
     public static void setSettingsTheme(final Context context) {
         context.setTheme(getSettingsThemeStyle(context));
@@ -106,6 +108,8 @@ public final class ThemeHelper {
     /**
      * Switch the launcher alias so its background follows the selected app accent.
      * Semantic colors such as success and error remain independent of this preference.
+     *
+     * @param context context used to read the accent preference and update the launcher component
      */
     public static void updateLauncherIcon(final Context context) {
         final String key = context.getString(R.string.accent_color_key);
