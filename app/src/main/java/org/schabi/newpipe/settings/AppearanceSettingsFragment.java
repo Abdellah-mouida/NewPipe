@@ -19,6 +19,25 @@ public class AppearanceSettingsFragment extends BasePreferenceFragment {
     public void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
         addPreferencesFromResourceRegistry();
 
+
+        final String accentColorKey = getString(R.string.accent_color_key);
+        findPreference(accentColorKey).setOnPreferenceChangeListener((preference, newValue) -> {
+            final String selectedAccent = newValue.toString();
+            final String currentAccent = defaultPreferences.getString(accentColorKey,
+                    getString(R.string.default_accent_color_value));
+            if (!selectedAccent.equals(currentAccent)) {
+                defaultPreferences.edit()
+                        .putBoolean(Constants.KEY_THEME_CHANGE, true)
+                        .putString(accentColorKey, selectedAccent)
+                        .apply();
+                ThemeHelper.updateLauncherIcon(requireContext());
+                if (getActivity() != null) {
+                    ActivityCompat.recreate(getActivity());
+                }
+            }
+            return false;
+        });
+
         final String themeKey = getString(R.string.theme_key);
         final String darkThemeKey = getString(R.string.dark_theme_key);
         final String blackThemeKey = getString(R.string.black_theme_key);
