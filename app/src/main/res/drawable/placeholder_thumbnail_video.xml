@@ -7,8 +7,8 @@
         </shape>
     </item>
     <item
-        android:width="16dp"
-        android:height="16dp"
+        android:width="12dp"
+        android:height="12dp"
         android:gravity="center"
         android:drawable="@drawable/np_thumbnail_loading" />
 </layer-list>
