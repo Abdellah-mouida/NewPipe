@@ -317,6 +317,11 @@ jobs:
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $tag already exists; leaving the published release unchanged." >> "$GITHUB_STEP_SUMMARY"
           else
+            # A tag can exist without a GitHub Release. Only in that case,
+            # point it at the exact commit that passed CI before publishing.
+            git tag --force "$tag" "$GITHUB_SHA"
+            git push --force origin "refs/tags/${tag}"
+
             gh release create "$tag" \
               "NewPipe-v${VERSION_NAME}.apk" \
               "NewPipe-v${VERSION_NAME}.aab" \
