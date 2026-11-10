@@ -6,9 +6,4 @@
         android:startColor="?attr/npColorAccentGradientStart"
         android:endColor="?attr/npColorAccentGradientEnd"
         android:type="linear" />
-    <corners
-        android:topLeftRadius="26dp"
-        android:topRightRadius="26dp"
-        android:bottomLeftRadius="18dp"
-        android:bottomRightRadius="18dp" />
 </shape>
