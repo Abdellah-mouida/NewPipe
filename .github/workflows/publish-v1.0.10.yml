@@ -145,27 +145,27 @@ jobs:
           fi
 
           if gh release view v1.0.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release edit v1.0.10 \\
-              --repo "$GITHUB_REPOSITORY" \\
-              --target "$GITHUB_SHA" \\
-              --title "NewPipe v1.0.10" \\
+            gh release edit v1.0.10 \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
               --notes-file release-notes.md
-            gh release upload v1.0.10 release-assets/* \\
-              --repo "$GITHUB_REPOSITORY" \\
+            gh release upload v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
               --clobber
           elif [[ "$PRERELEASE" == "true" ]]; then
-            gh release create v1.0.10 release-assets/* \\
-              --repo "$GITHUB_REPOSITORY" \\
-              --target "$GITHUB_SHA" \\
-              --title "NewPipe v1.0.10" \\
-              --prerelease \\
-              --latest=false \\
+            gh release create v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
+              --prerelease \
+              --latest=false \
               --notes-file release-notes.md
           else
-            gh release create v1.0.10 release-assets/* \\
-              --repo "$GITHUB_REPOSITORY" \\
-              --target "$GITHUB_SHA" \\
-              --title "NewPipe v1.0.10" \\
+            gh release create v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
               --notes-file release-notes.md
           fi
 
