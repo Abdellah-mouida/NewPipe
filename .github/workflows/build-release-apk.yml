@@ -37,7 +37,12 @@ jobs:
 
       - name: Install Android SDK 37.0
         run: |
-          sdkmanager --install "platforms;android-37" "build-tools;37.0.0"
+          set -euo pipefail
+          sdkmanager --install "platforms;android-37.0" "build-tools;37.0.0"
+          test -d "$ANDROID_HOME/platforms/android-37.0"
+          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
+            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          fi
 
       - name: Check release signing secrets
         id: signing
