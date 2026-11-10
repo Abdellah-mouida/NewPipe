@@ -24,6 +24,7 @@ import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -388,6 +389,14 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         searchToolbarContainer = activity.findViewById(R.id.toolbar_search_container);
         searchEditText = searchToolbarContainer.findViewById(R.id.toolbar_search_edit_text);
         searchClear = searchToolbarContainer.findViewById(R.id.toolbar_search_clear);
+
+        // Apply after inflation so a themed widget style cannot restore its default
+        // vertical padding or replace the toolbar's explicit text gravity.
+        searchEditText.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        searchEditText.setIncludeFontPadding(false);
+        searchEditText.setPaddingRelative(
+                searchEditText.getPaddingStart(), 0, searchEditText.getPaddingEnd(), 0);
+        searchEditText.setSingleLine(true);
     }
 
     /*//////////////////////////////////////////////////////////////////////////
