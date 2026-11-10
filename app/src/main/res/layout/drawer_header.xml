@@ -13,48 +13,55 @@
         android:layout_marginTop="@dimen/drawer_header_padding_top"
         android:fitsSystemWindows="true"
         android:gravity="bottom"
-        android:minHeight="@dimen/drawer_header_content_min_height"
+        android:minHeight="190dp"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:gravity="center"
-            android:orientation="horizontal"
-            tools:ignore="UseCompoundDrawables">
+            android:orientation="vertical">
 
             <ImageView
-                android:layout_width="@dimen/drawer_header_newpipe_icon_size"
-                android:layout_height="@dimen/drawer_header_newpipe_icon_size"
-                android:layout_marginEnd="@dimen/drawer_header_newpipe_icon_title_space"
-                android:src="@drawable/splash_foreground"
-                tools:ignore="ContentDescription" />
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/splash_foreground" />
 
             <org.schabi.newpipe.views.NewPipeTextView
                 android:id="@+id/drawer_header_newpipe_title"
-                android:layout_width="@dimen/drawer_header_newpipe_title_default_width"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/drawer_header_newpipe_icon_title_space"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:gravity="start|center_vertical"
+                android:gravity="center"
                 android:hyphenationFrequency="full"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="@string/app_name"
                 android:textColor="@color/drawer_header_font_color"
-                android:textStyle="bold"
-                app:autoSizeMaxTextSize="@dimen/drawer_header_newpipe_title_max_text_size"
-                app:autoSizeMinTextSize="@dimen/drawer_header_newpipe_title_min_text_size"
-                app:autoSizeTextType="uniform"
-                tools:ignore="UnusedAttribute" />
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:includeFontPadding="false"
+                android:text="@string/made_by_abdellah_mouida"
+                android:textColor="#B3FFFFFF"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/drawer_header_bottom_background"
             android:gravity="center"
             android:orientation="horizontal"
