@@ -99,7 +99,7 @@
     <style name="ToolbarSearchInputTheme">
         <item name="colorPrimary">?attr/toolbarSearchColor</item>
         <item name="colorPrimaryDark">?attr/toolbarSearchColor</item>
-        <item name="colorAccent">?attr/toolbarSearchColor</item>
+        <item name="colorAccent">?attr/npColorAccent</item>
     </style>
 
     <style name="CircularImageView">
