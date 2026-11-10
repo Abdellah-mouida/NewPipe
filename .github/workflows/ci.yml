@@ -54,9 +54,7 @@ jobs:
 
       - name: Install Android SDK 37.0
         run: |
-          android sdk install \
-            platforms/android-37.0 \
-            build-tools/37.0.0
+          sdkmanager --install "platforms;android-37" "build-tools;37.0.0"
 
       - name: Show build environment
         run: |
@@ -130,9 +128,7 @@ jobs:
 
       - name: Install compile SDK 37.0
         run: |
-          android sdk install \
-            platforms/android-37.0 \
-            build-tools/37.0.0
+          sdkmanager --install "platforms;android-37" "build-tools;37.0.0"
 
       - name: Enable KVM
         run: |
@@ -214,9 +210,7 @@ jobs:
       - name: Install Android SDK 37.0
         if: steps.head.outputs.current == 'true'
         run: |
-          android sdk install \
-            platforms/android-37.0 \
-            build-tools/37.0.0
+          sdkmanager --install "platforms;android-37" "build-tools;37.0.0"
 
       - name: Require Android release signing secrets
         if: steps.head.outputs.current == 'true'
