@@ -20,7 +20,9 @@
 package org.schabi.newpipe.util;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -73,6 +75,65 @@ public final class ThemeHelper {
      */
     public static void setTheme(final Context context, final int serviceId) {
         context.setTheme(getThemeForService(context, serviceId));
+        context.getTheme().applyStyle(getAccentColorStyle(context), true);
+        updateLauncherIcon(context);
+    }
+
+    /**
+     * Applies the appearance theme plus the user's selected accent to the settings activity.
+     * Call this before the activity's super.onCreate().
+     */
+    public static void setSettingsTheme(final Context context) {
+        context.setTheme(getSettingsThemeStyle(context));
+        context.getTheme().applyStyle(getAccentColorStyle(context), true);
+        updateLauncherIcon(context);
+    }
+
+    @StyleRes
+    private static int getAccentColorStyle(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        final String accent = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
+        return switch (accent) {
+            case "violet" -> R.style.AccentColorViolet;
+            case "red" -> R.style.AccentColorRed;
+            case "green" -> R.style.AccentColorGreen;
+            case "blue" -> R.style.AccentColorBlue;
+            default -> R.style.AccentColorBlue;
+        };
+    }
+
+    /**
+     * Switch the launcher alias so its background follows the selected app accent.
+     * Semantic colors such as success and error remain independent of this preference.
+     */
+    public static void updateLauncherIcon(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        final String accent = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
+        final String selectedAlias = switch (accent) {
+            case "violet" -> "LauncherViolet";
+            case "red" -> "LauncherRed";
+            case "green" -> "LauncherGreen";
+            case "blue" -> "LauncherBlue";
+            default -> "LauncherBlue";
+        };
+
+        final PackageManager packageManager = context.getPackageManager();
+        final String[] aliases = {
+                "LauncherBlue", "LauncherViolet", "LauncherRed", "LauncherGreen"
+        };
+        for (final String alias : aliases) {
+            final ComponentName component = new ComponentName(
+                    context.getPackageName(), context.getPackageName() + "." + alias);
+            final int desiredState = alias.equals(selectedAlias)
+                    ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                    : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            if (packageManager.getComponentEnabledSetting(component) != desiredState) {
+                packageManager.setComponentEnabledSetting(component, desiredState,
+                        PackageManager.DONT_KILL_APP);
+            }
+        }
     }
 
     /**
@@ -94,7 +155,12 @@ public final class ThemeHelper {
      */
     @StyleRes
     public static int getDialogTheme(final Context context) {
-        return isLightThemeSelected(context) ? R.style.LightDialogTheme : R.style.DarkDialogTheme;
+        return switch (getSelectedAccentValue(context)) {
+            case "violet" -> R.style.DarkDialogTheme_Violet;
+            case "red" -> R.style.DarkDialogTheme_Red;
+            case "green" -> R.style.DarkDialogTheme_Green;
+            default -> R.style.DarkDialogTheme_Blue;
+        };
     }
 
     /**
@@ -105,8 +171,12 @@ public final class ThemeHelper {
      */
     @StyleRes
     public static int getMinWidthDialogTheme(final Context context) {
-        return isLightThemeSelected(context) ? R.style.LightDialogMinWidthTheme
-                : R.style.DarkDialogMinWidthTheme;
+        return switch (getSelectedAccentValue(context)) {
+            case "violet" -> R.style.DarkDialogMinWidthTheme_Violet;
+            case "red" -> R.style.DarkDialogMinWidthTheme_Red;
+            case "green" -> R.style.DarkDialogMinWidthTheme_Green;
+            default -> R.style.DarkDialogMinWidthTheme_Blue;
+        };
     }
 
     /**
@@ -205,6 +275,12 @@ public final class ThemeHelper {
             return 0;
         }
         return context.getResources().getDimensionPixelSize(resId);
+    }
+
+    private static String getSelectedAccentValue(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
     }
 
     private static String getSelectedThemeKey(final Context context) {

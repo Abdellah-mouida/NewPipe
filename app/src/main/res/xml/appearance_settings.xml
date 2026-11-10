@@ -13,6 +13,17 @@
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
 
+
+    <ListPreference
+        android:defaultValue="@string/default_accent_color_value"
+        android:entries="@array/accent_color_description_list"
+        android:entryValues="@array/accent_color_values_list"
+        android:key="@string/accent_color_key"
+        android:title="@string/accent_color_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
+
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="@string/show_hold_to_append_key"

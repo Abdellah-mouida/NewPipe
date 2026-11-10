@@ -251,4 +251,85 @@
 
     <style name="RouterActivityThemeDark" parent="Base.RouterActivityThemeDark" />
 
+
+    <!-- User-selectable accent palettes. Semantic success/error colors remain independent. -->
+    <style name="AccentColorBlue">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorPrimaryDark">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+        <item name="npColorAccent">@color/np_accent_blue</item>
+        <item name="npColorAccentContainer">@color/np_accent_blue_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_blue</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_blue_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_blue_end</item>
+    </style>
+    <style name="AccentColorViolet">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorPrimaryDark">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+        <item name="npColorAccent">@color/np_accent_violet</item>
+        <item name="npColorAccentContainer">@color/np_accent_violet_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_violet</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_violet_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_violet_end</item>
+    </style>
+    <style name="AccentColorRed">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorPrimaryDark">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+        <item name="npColorAccent">@color/np_accent_red</item>
+        <item name="npColorAccentContainer">@color/np_accent_red_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_red</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_red_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_red_end</item>
+    </style>
+    <style name="AccentColorGreen">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorPrimaryDark">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+        <item name="npColorAccent">@color/np_accent_green</item>
+        <item name="npColorAccentContainer">@color/np_accent_green_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_green</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_green_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_green_end</item>
+    </style>
+
+    <!-- Dialog variants keep the selected accent consistent with the activity theme. -->
+    <style name="DarkDialogTheme.Blue" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+    </style>
+    <style name="DarkDialogTheme.Violet" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+    </style>
+    <style name="DarkDialogTheme.Red" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+    </style>
+    <style name="DarkDialogTheme.Green" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Blue" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Violet" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Red" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Green" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+    </style>
+
 </resources>

@@ -276,6 +276,16 @@
         <item>@string/black_theme_title</item>
     </string-array>
 
+
+    <string name="accent_color_key">accent_color</string>
+    <string name="default_accent_color_value">blue</string>
+    <string-array name="accent_color_values_list">
+        <item>blue</item>
+        <item>violet</item>
+        <item>red</item>
+        <item>green</item>
+    </string-array>
+
     <!-- Caption Size -->
     <string name="caption_settings_key">caption_settings_key</string>
     <string name="caption_user_set_key">caption_user_set_key</string>

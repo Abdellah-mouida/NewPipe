@@ -71,4 +71,27 @@
     <color name="np_scrim">#80000000</color>
     <color name="np_player_scrim">#CC000000</color>
     <color name="np_duration_scrim">#B8000000</color>
+
+    <!-- Accent palette (shared by Dark and AMOLED themes) -->
+    <color name="np_accent_blue">#2563EB</color>
+    <color name="np_accent_blue_container">#10264A</color>
+    <color name="np_accent_blue_mid">#3B82F6</color>
+    <color name="np_accent_blue_end">#1D4ED8</color>
+
+    <color name="np_accent_violet">#6D28D9</color>
+    <color name="np_accent_violet_container">#2E1065</color>
+    <color name="np_accent_violet_mid">#8B5CF6</color>
+    <color name="np_accent_violet_end">#5B21B6</color>
+
+    <color name="np_accent_red">#DC2626</color>
+    <color name="np_accent_red_container">#450A0A</color>
+    <color name="np_accent_red_mid">#EF4444</color>
+    <color name="np_accent_red_end">#991B1B</color>
+
+    <color name="np_accent_green">#15803D</color>
+    <color name="np_accent_green_container">#052E16</color>
+    <color name="np_accent_green_mid">#16A34A</color>
+    <color name="np_accent_green_end">#166534</color>
+    <color name="np_accent_on">#FFFFFF</color>
+
 </resources>
