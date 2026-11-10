@@ -51,7 +51,9 @@ if [ "$api_level" = "27" ]; then
   # A launch-command transport error is not treated as a pass or a crash;
   # the process and resumed activity are verified independently below.
   launch_output=""
-  if ! launch_output="$(timeout 30s adb shell am start -n "$component" 2>&1)"; then
+  if launch_output="$(timeout 30s adb shell am start -n "$component" 2>&1)"; then
+    :
+  else
     launch_status=$?
     echo "Non-blocking activity launch returned status $launch_status; checking emulator state."
     printf '%s\n' "$launch_output"
@@ -92,7 +94,7 @@ if [ "$api_level" = "27" ]; then
 
   app_pid="$(adb shell pidof "$package_name" 2>/dev/null | tr -d '\r' || true)"
   activity_dump="$(adb shell dumpsys activity activities 2>/dev/null || true)"
-  if [ -z "$app_pid" ] || ! printf '%s\n' "$activity_dump" | grep -F "$package_name/" >/dev/null; then
+  if [ -z "$app_pid" ] || ! printf '%s\n' "$activity_dump" | grep -E "mResumedActivity:.*$package_name/" >/dev/null; then
     echo "MainActivity did not remain alive and resumed after launch." >&2
     dump_emulator_diagnostics
     exit 1
