@@ -46,7 +46,7 @@
             android:launchMode="singleTask" />
 
         <activity-alias
-            android:name=".LauncherBlue"
+            android:name="${applicationId}.LauncherBlue"
             android:enabled="true"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_blue"
@@ -60,7 +60,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name=".LauncherViolet"
+            android:name="${applicationId}.LauncherViolet"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_violet"
@@ -74,7 +74,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name=".LauncherRed"
+            android:name="${applicationId}.LauncherRed"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_red"
@@ -88,7 +88,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name=".LauncherGreen"
+            android:name="${applicationId}.LauncherGreen"
             android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_green"
