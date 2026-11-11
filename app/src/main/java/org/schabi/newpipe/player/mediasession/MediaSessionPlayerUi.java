@@ -49,6 +49,15 @@ public class MediaSessionPlayerUi extends PlayerUi
     // used to check whether any notification action changed, before sending costly updates
     private List<NotificationActionData> prevNotificationActions = List.of();
 
+    // Keep the artwork sent to System UI small enough for lock-screen metadata, and cache the
+    // derived bitmaps because MediaSessionConnector can ask for metadata during state updates.
+    @Nullable
+    private Bitmap sourceThumbnail;
+    @Nullable
+    private Bitmap mediaSessionArtwork;
+    @Nullable
+    private Bitmap mediaSessionDisplayIcon;
+
 
     public MediaSessionPlayerUi(@NonNull final Player player,
                                 @NonNull final MediaSessionCompat mediaSession,
@@ -96,6 +105,9 @@ public class MediaSessionPlayerUi extends PlayerUi
         sessionConnector.setQueueNavigator(null);
         mediaSession.setActive(false);
         prevNotificationActions = List.of();
+        sourceThumbnail = null;
+        mediaSessionArtwork = null;
+        mediaSessionDisplayIcon = null;
     }
 
     @Override
@@ -111,6 +123,10 @@ public class MediaSessionPlayerUi extends PlayerUi
                                           final String key) {
         if (key == null || key.equals(ignoreHardwareMediaButtonsKey)) {
             updateShouldIgnoreHardwareMediaButtons(sharedPreferences);
+        }
+        if (key == null || key.equals(context.getString(R.string.show_thumbnail_key))) {
+            // Keep the system lock screen and media controls in sync with the thumbnail setting.
+            sessionConnector.invalidateMediaSessionMetadata();
         }
     }
 
@@ -156,7 +172,10 @@ public class MediaSessionPlayerUi extends PlayerUi
         // set title and artist
         final MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player.getVideoTitle())
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player.getUploaderName());
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player.getUploaderName())
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, player.getVideoTitle())
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
+                        player.getUploaderName());
 
         // set duration (-1 for livestreams or if unknown, see the METADATA_KEY_DURATION docs)
         final long duration = player.getCurrentStreamInfo()
@@ -165,17 +184,60 @@ public class MediaSessionPlayerUi extends PlayerUi
                 .orElse(-1L);
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
 
-        // set album art, unless the user asked not to, or there is no thumbnail available
         final boolean showThumbnail = player.getPrefs().getBoolean(
                 context.getString(R.string.show_thumbnail_key), true);
-        Optional.ofNullable(player.getThumbnail())
-                .filter(bitmap -> showThumbnail)
-                .ifPresent(bitmap -> {
-                    builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
-                    builder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, bitmap);
-                });
+        final Bitmap artwork = getMediaSessionArtwork(showThumbnail ? player.getThumbnail() : null);
+        if (artwork != null && mediaSessionDisplayIcon != null) {
+            // ART is the key used for lock-screen background artwork on older Android releases.
+            // ALBUM_ART and DISPLAY_ICON supply the square artwork used by modern media surfaces.
+            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork)
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, mediaSessionDisplayIcon)
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, mediaSessionDisplayIcon);
+        }
 
         return builder.build();
+    }
+
+    @Nullable
+    private Bitmap getMediaSessionArtwork(@Nullable final Bitmap thumbnail) {
+        if (thumbnail == null) {
+            sourceThumbnail = null;
+            mediaSessionArtwork = null;
+            mediaSessionDisplayIcon = null;
+            return null;
+        }
+
+        if (thumbnail == sourceThumbnail) {
+            return mediaSessionArtwork;
+        }
+
+        sourceThumbnail = thumbnail;
+        final int maxDimension = Math.max(1, Math.round(320f
+                * context.getResources().getDisplayMetrics().density));
+        mediaSessionArtwork = scaleBitmapToFit(thumbnail, maxDimension);
+
+        // System UIs commonly render DISPLAY_ICON as a rounded/square cover image. Crop the
+        // landscape video thumbnail centrally for that slot while preserving the full frame in ART.
+        final int squareSize = Math.min(thumbnail.getWidth(), thumbnail.getHeight());
+        final int cropLeft = (thumbnail.getWidth() - squareSize) / 2;
+        final int cropTop = (thumbnail.getHeight() - squareSize) / 2;
+        final Bitmap squareThumbnail = Bitmap.createBitmap(
+                thumbnail, cropLeft, cropTop, squareSize, squareSize);
+        mediaSessionDisplayIcon = scaleBitmapToFit(squareThumbnail, maxDimension);
+        return mediaSessionArtwork;
+    }
+
+    @NonNull
+    private static Bitmap scaleBitmapToFit(@NonNull final Bitmap bitmap, final int maxDimension) {
+        final int currentMaxDimension = Math.max(bitmap.getWidth(), bitmap.getHeight());
+        if (currentMaxDimension <= maxDimension) {
+            return bitmap;
+        }
+
+        final float scale = (float) maxDimension / currentMaxDimension;
+        final int width = Math.max(1, Math.round(bitmap.getWidth() * scale));
+        final int height = Math.max(1, Math.round(bitmap.getHeight() * scale));
+        return Bitmap.createScaledBitmap(bitmap, width, height, true);
     }
 
 

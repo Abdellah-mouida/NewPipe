@@ -13,7 +13,6 @@ import com.google.android.exoplayer2.Player.RepeatMode;
 
 import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.player.Player;
-import org.schabi.newpipe.player.helper.PlayerHelper;
 import org.schabi.newpipe.player.ui.PlayerUi;
 
 public final class NotificationPlayerUi extends PlayerUi {
@@ -60,13 +59,11 @@ public final class NotificationPlayerUi extends PlayerUi {
     public void onPaused() {
         super.onPaused();
 
-        // Remove running notification when user does not want minimization to background or popup
-        if (PlayerHelper.getMinimizeOnExitAction(context) == MINIMIZE_ON_EXIT_MODE_NONE
-                && player.videoPlayerSelected()) {
-            notificationUtil.cancelNotificationAndStopForeground();
-        } else {
-            notificationUtil.createNotificationIfNeededAndUpdate(false);
-        }
+        // Keep the MediaStyle notification available while paused. On API 23-32 this notification
+        // is the lock-screen control surface; removing it here also removes the user's ability to
+        // resume playback from the lock screen. The close action still lets users dismiss the
+        // player explicitly.
+        notificationUtil.createNotificationIfNeededAndUpdate(false);
     }
 
     @Override

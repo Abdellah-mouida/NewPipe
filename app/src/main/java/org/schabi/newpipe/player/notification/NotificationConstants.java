@@ -110,7 +110,9 @@ public final class NotificationConstants {
     };
 
 
-    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 1, 2);
+    // Keep previous, play/pause and repeat visible in the compact notification/lock-screen row.
+    // Next, seek and close remain available in the expanded notification.
+    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 1, 3);
 
     public static final int[] SLOT_COMPACT_PREF_KEYS = {
             R.string.notification_slot_compact_0_key,
