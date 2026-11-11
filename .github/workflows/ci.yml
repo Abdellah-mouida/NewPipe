@@ -7,6 +7,7 @@ on:
       - master
       - premium
       - 'redesign/**'
+      - 'feature-*'
     # The release job bumps only this file after publishing. Do not start a
     # second CI/release cycle for that bot-generated version-only commit.
     paths-ignore:
