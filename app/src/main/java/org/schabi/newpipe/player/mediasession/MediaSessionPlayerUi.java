@@ -193,7 +193,8 @@ public class MediaSessionPlayerUi extends PlayerUi
             // ALBUM_ART and DISPLAY_ICON supply the square artwork used by modern media surfaces.
             builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork)
                     .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, mediaSessionDisplayIcon)
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, mediaSessionDisplayIcon);
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON,
+                            mediaSessionDisplayIcon);
         }
 
         return builder.build();
