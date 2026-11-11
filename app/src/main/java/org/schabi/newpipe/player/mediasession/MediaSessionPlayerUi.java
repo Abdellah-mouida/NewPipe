@@ -186,7 +186,8 @@ public class MediaSessionPlayerUi extends PlayerUi
 
         final boolean showThumbnail = player.getPrefs().getBoolean(
                 context.getString(R.string.show_thumbnail_key), true);
-        final Bitmap artwork = getMediaSessionArtwork(showThumbnail ? player.getThumbnail() : null);
+        final Bitmap artwork = getMediaSessionArtwork(
+                showThumbnail ? player.getThumbnail() : null);
         if (artwork != null && mediaSessionDisplayIcon != null) {
             // ART is the key used for lock-screen background artwork on older Android releases.
             // ALBUM_ART and DISPLAY_ICON supply the square artwork used by modern media surfaces.

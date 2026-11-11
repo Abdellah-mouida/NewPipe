@@ -1,6 +1,5 @@
 package org.schabi.newpipe.player.notification;
 
-import static org.schabi.newpipe.player.helper.PlayerHelper.MinimizeMode.MINIMIZE_ON_EXIT_MODE_NONE;
 import static org.schabi.newpipe.player.notification.NotificationConstants.ACTION_RECREATE_NOTIFICATION;
 
 import android.content.Intent;
