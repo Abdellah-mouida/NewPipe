@@ -2,13 +2,21 @@ package org.schabi.newpipe.util.image
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Animatable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.util.Log
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.request.Disposable
 import coil3.request.ImageRequest
+import coil3.request.crossfade
 import coil3.request.error
 import coil3.request.placeholder
 import coil3.request.target
@@ -54,14 +62,143 @@ object CoilHelper {
         target: ImageView,
         images: List<Image>
     ) {
-        loadImageDefault(target, images, R.drawable.placeholder_thumbnail_video)
+        loadThumbnailAnimated(target, images)
     }
 
     fun loadThumbnail(
         target: ImageView,
         url: String?
     ) {
-        loadImageDefault(target, url, R.drawable.placeholder_thumbnail_video)
+        loadThumbnailAnimated(target, url, null)
+    }
+
+    /**
+     * Loads a stream thumbnail and animates the decoded image into place.
+     *
+     * The placeholder remains visible while the request is pending or fails.
+     * View properties are reset for every request so RecyclerView reuse cannot
+     * leave a recycled thumbnail transparent or scaled down.
+     */
+    fun loadThumbnailAnimated(
+        target: ImageView,
+        images: List<Image>
+    ) {
+        loadThumbnailAnimated(target, images, null)
+    }
+
+    fun loadThumbnailAnimated(
+        target: ImageView,
+        images: List<Image>,
+        skeleton: View?
+    ) {
+        loadThumbnailAnimated(
+            target,
+            ImageStrategy.choosePreferredImage(images),
+            skeleton
+        )
+    }
+
+    private fun loadThumbnailAnimated(
+        target: ImageView,
+        url: String?,
+        skeleton: View?
+    ) {
+        target.animate().cancel()
+        target.alpha = 1f
+        target.scaleX = 1f
+        target.scaleY = 1f
+        findThumbnailAnimation(target.drawable)?.stop()
+
+        if (url.isNullOrEmpty() || !ImageStrategy.shouldLoadImages()) {
+            hideThumbnailSkeleton(skeleton)
+            target.setImageResource(R.drawable.placeholder_thumbnail_video)
+            findThumbnailAnimation(target.drawable)?.start()
+            return
+        }
+
+        val request = getImageRequest(
+            target.context,
+            url,
+            R.drawable.placeholder_thumbnail_video
+        )
+            .crossfade(false)
+            .target(target)
+            .listener(
+                onStart = {
+                    target.animate().cancel()
+                    target.alpha = 1f
+                    target.scaleX = 1f
+                    target.scaleY = 1f
+                    startThumbnailSkeleton(skeleton)
+                    // Start after Coil installs its placeholder drawable.
+                    target.post {
+                        findThumbnailAnimation(target.drawable)?.start()
+                    }
+                },
+                onSuccess = { _, _ ->
+                    findThumbnailAnimation(target.drawable)?.stop()
+                    hideThumbnailSkeleton(skeleton)
+                    target.animate().cancel()
+                    target.alpha = 0f
+                    target.scaleX = 0.985f
+                    target.scaleY = 0.985f
+                    target.animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(280L)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+                },
+                onError = { _, _ ->
+                    hideThumbnailSkeleton(skeleton)
+                    target.post {
+                        findThumbnailAnimation(target.drawable)?.start()
+                    }
+                }
+            )
+            .build()
+
+        target.context.imageLoader.enqueue(request)
+    }
+
+    /**
+     * The thumbnail placeholder is a LayerDrawable containing an AnimatedVectorDrawable.
+     * Find the nested animation because LayerDrawable itself is not Animatable.
+     */
+    private fun findThumbnailAnimation(drawable: Drawable?): Animatable? {
+        drawable ?: return null
+        if (drawable is Animatable) {
+            return drawable
+        }
+        if (drawable is LayerDrawable) {
+            for (index in 0 until drawable.numberOfLayers) {
+                findThumbnailAnimation(drawable.getDrawable(index))?.let { return it }
+            }
+        }
+        return null
+    }
+
+    private fun startThumbnailSkeleton(skeleton: View?) {
+        skeleton ?: return
+        skeleton.clearAnimation()
+        skeleton.alpha = 1f
+        skeleton.visibility = View.VISIBLE
+        skeleton.startAnimation(
+            AlphaAnimation(0.62f, 1f).apply {
+                duration = 850L
+                repeatMode = Animation.REVERSE
+                repeatCount = Animation.INFINITE
+                interpolator = DecelerateInterpolator()
+            }
+        )
+    }
+
+    private fun hideThumbnailSkeleton(skeleton: View?) {
+        skeleton ?: return
+        skeleton.clearAnimation()
+        skeleton.alpha = 1f
+        skeleton.visibility = View.GONE
     }
 
     fun loadScaledDownThumbnail(
@@ -173,6 +310,7 @@ object CoilHelper {
         return ImageRequest
             .Builder(context)
             .data(takenUrl)
+            .crossfade(220)
             .error(placeholderResId)
             .memoryCacheKey(takenUrl)
             .diskCacheKey(takenUrl)

@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.database.stream.model.StreamStateEntity;
@@ -24,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class StreamMiniInfoItemHolder extends InfoItemHolder {
     public final ImageView itemThumbnailView;
+    private final View itemThumbnailSkeletonView;
+    private final ImageView itemUploaderAvatarView;
     public final TextView itemVideoTitleView;
     public final TextView itemUploaderView;
     public final TextView itemDurationView;
@@ -34,6 +35,8 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         super(infoItemBuilder, layoutId, parent);
 
         itemThumbnailView = itemView.findViewById(R.id.itemThumbnailView);
+        itemThumbnailSkeletonView = itemView.findViewById(R.id.itemThumbnailSkeletonView);
+        itemUploaderAvatarView = itemView.findViewById(R.id.itemUploaderAvatarView);
         itemVideoTitleView = itemView.findViewById(R.id.itemVideoTitleView);
         itemUploaderView = itemView.findViewById(R.id.itemUploaderView);
         itemDurationView = itemView.findViewById(R.id.itemDurationView);
@@ -54,11 +57,13 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
 
         itemVideoTitleView.setText(item.getName());
         itemUploaderView.setText(item.getUploaderName());
+        if (itemUploaderAvatarView != null) {
+            CoilHelper.INSTANCE.loadAvatar(itemUploaderAvatarView, item.getUploaderAvatars());
+        }
 
         if (item.getDuration() > 0) {
             itemDurationView.setText(Localization.getDurationString(item.getDuration()));
-            itemDurationView.setBackgroundColor(ContextCompat.getColor(itemBuilder.getContext(),
-                    R.color.duration_background_color));
+            itemDurationView.setBackgroundResource(R.drawable.np_duration_badge);
             itemDurationView.setVisibility(View.VISIBLE);
 
             StreamStateEntity state2 = null;
@@ -77,8 +82,7 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
             }
         } else if (StreamTypeUtil.isLiveStream(item.getStreamType())) {
             itemDurationView.setText(R.string.duration_live);
-            itemDurationView.setBackgroundColor(ContextCompat.getColor(itemBuilder.getContext(),
-                    R.color.live_duration_background_color));
+            itemDurationView.setBackgroundResource(R.drawable.np_duration_live_badge);
             itemDurationView.setVisibility(View.VISIBLE);
             itemProgressView.setVisibility(View.GONE);
         } else {
@@ -87,7 +91,10 @@ public class StreamMiniInfoItemHolder extends InfoItemHolder {
         }
 
         // Default thumbnail is shown on error, while loading and if the url is empty
-        CoilHelper.INSTANCE.loadThumbnail(itemThumbnailView, item.getThumbnails());
+        CoilHelper.INSTANCE.loadThumbnailAnimated(
+                itemThumbnailView,
+                item.getThumbnails(),
+                itemThumbnailSkeletonView);
 
         itemView.setOnClickListener(view -> {
             if (itemBuilder.getOnStreamSelectedListener() != null) {

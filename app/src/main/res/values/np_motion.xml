@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="np_motion_press">100</integer>
+    <integer name="np_motion_fast">160</integer>
+    <integer name="np_motion_standard">240</integer>
+    <integer name="np_motion_page">280</integer>
+    <integer name="np_motion_emphasized">320</integer>
+    <integer name="np_motion_stagger">40</integer>
+</resources>

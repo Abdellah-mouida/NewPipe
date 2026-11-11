@@ -20,7 +20,9 @@
 package org.schabi.newpipe.util;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -73,6 +75,69 @@ public final class ThemeHelper {
      */
     public static void setTheme(final Context context, final int serviceId) {
         context.setTheme(getThemeForService(context, serviceId));
+        context.getTheme().applyStyle(getAccentColorStyle(context), true);
+        updateLauncherIcon(context);
+    }
+
+    /**
+     * Applies the appearance theme plus the user's selected accent to the settings activity.
+     * Call this before the activity's super.onCreate().
+     *
+     * @param context the settings activity that receives the selected theme
+     */
+    public static void setSettingsTheme(final Context context) {
+        context.setTheme(getSettingsThemeStyle(context));
+        context.getTheme().applyStyle(getAccentColorStyle(context), true);
+        updateLauncherIcon(context);
+    }
+
+    @StyleRes
+    private static int getAccentColorStyle(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        final String accent = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
+        return switch (accent) {
+            case "violet" -> R.style.AccentColorViolet;
+            case "red" -> R.style.AccentColorRed;
+            case "green" -> R.style.AccentColorGreen;
+            case "blue" -> R.style.AccentColorBlue;
+            default -> R.style.AccentColorBlue;
+        };
+    }
+
+    /**
+     * Switch the launcher alias so its background follows the selected app accent.
+     * Semantic colors such as success and error remain independent of this preference.
+     *
+     * @param context context used to read the accent preference and update the launcher component
+     */
+    public static void updateLauncherIcon(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        final String accent = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
+        final String selectedAlias = switch (accent) {
+            case "violet" -> "LauncherViolet";
+            case "red" -> "LauncherRed";
+            case "green" -> "LauncherGreen";
+            case "blue" -> "LauncherBlue";
+            default -> "LauncherBlue";
+        };
+
+        final PackageManager packageManager = context.getPackageManager();
+        final String[] aliases = {
+                "LauncherBlue", "LauncherViolet", "LauncherRed", "LauncherGreen"
+        };
+        for (final String alias : aliases) {
+            final ComponentName component = new ComponentName(
+                    context.getPackageName(), context.getPackageName() + "." + alias);
+            final int desiredState = alias.equals(selectedAlias)
+                    ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                    : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            if (packageManager.getComponentEnabledSetting(component) != desiredState) {
+                packageManager.setComponentEnabledSetting(component, desiredState,
+                        PackageManager.DONT_KILL_APP);
+            }
+        }
     }
 
     /**
@@ -82,12 +147,8 @@ public final class ThemeHelper {
      * @return whether the light theme is selected
      */
     public static boolean isLightThemeSelected(final Context context) {
-        final String selectedThemeKey = getSelectedThemeKey(context);
-        final Resources res = context.getResources();
-
-        return selectedThemeKey.equals(res.getString(R.string.light_theme_key))
-                || (selectedThemeKey.equals(res.getString(R.string.auto_device_theme_key))
-                && !isDeviceDarkThemeEnabled(context));
+        // Kept for callers that choose dialog styles. The app is dark-only now.
+        return false;
     }
 
     /**
@@ -98,7 +159,12 @@ public final class ThemeHelper {
      */
     @StyleRes
     public static int getDialogTheme(final Context context) {
-        return isLightThemeSelected(context) ? R.style.LightDialogTheme : R.style.DarkDialogTheme;
+        return switch (getSelectedAccentValue(context)) {
+            case "violet" -> R.style.DarkDialogTheme_Violet;
+            case "red" -> R.style.DarkDialogTheme_Red;
+            case "green" -> R.style.DarkDialogTheme_Green;
+            default -> R.style.DarkDialogTheme_Blue;
+        };
     }
 
     /**
@@ -109,8 +175,12 @@ public final class ThemeHelper {
      */
     @StyleRes
     public static int getMinWidthDialogTheme(final Context context) {
-        return isLightThemeSelected(context) ? R.style.LightDialogMinWidthTheme
-                : R.style.DarkDialogMinWidthTheme;
+        return switch (getSelectedAccentValue(context)) {
+            case "violet" -> R.style.DarkDialogMinWidthTheme_Violet;
+            case "red" -> R.style.DarkDialogMinWidthTheme_Red;
+            case "green" -> R.style.DarkDialogMinWidthTheme_Green;
+            default -> R.style.DarkDialogMinWidthTheme_Blue;
+        };
     }
 
     /**
@@ -123,34 +193,11 @@ public final class ThemeHelper {
      */
     @StyleRes
     public static int getThemeForService(final Context context, final int serviceId) {
-        final Resources res = context.getResources();
-        final String lightThemeKey = res.getString(R.string.light_theme_key);
-        final String blackThemeKey = res.getString(R.string.black_theme_key);
-        final String automaticDeviceThemeKey = res.getString(R.string.auto_device_theme_key);
-
+        final String blackThemeKey = context.getString(R.string.black_theme_key);
         final String selectedThemeKey = getSelectedThemeKey(context);
 
-
-        int baseTheme = R.style.DarkTheme; // default to dark theme
-        if (selectedThemeKey.equals(lightThemeKey)) {
-            baseTheme = R.style.LightTheme;
-        } else if (selectedThemeKey.equals(blackThemeKey)) {
-            baseTheme = R.style.BlackTheme;
-        } else if (selectedThemeKey.equals(automaticDeviceThemeKey)) {
-
-            if (isDeviceDarkThemeEnabled(context)) {
-                // use the dark theme variant preferred by the user
-                final String selectedNightThemeKey = getSelectedNightThemeKey(context);
-                if (selectedNightThemeKey.equals(blackThemeKey)) {
-                    baseTheme = R.style.BlackTheme;
-                } else {
-                    baseTheme = R.style.DarkTheme;
-                }
-            } else {
-                // there is only one day theme
-                baseTheme = R.style.LightTheme;
-            }
-        }
+        final int baseTheme = selectedThemeKey.equals(blackThemeKey)
+                ? R.style.BlackTheme : R.style.DarkTheme;
 
         if (serviceId <= -1) {
             return baseTheme;
@@ -181,35 +228,9 @@ public final class ThemeHelper {
 
     @StyleRes
     public static int getSettingsThemeStyle(final Context context) {
-        final Resources res = context.getResources();
-        final String lightTheme = res.getString(R.string.light_theme_key);
-        final String blackTheme = res.getString(R.string.black_theme_key);
-        final String automaticDeviceTheme = res.getString(R.string.auto_device_theme_key);
-
-
-        final String selectedTheme = getSelectedThemeKey(context);
-
-        if (selectedTheme.equals(lightTheme)) {
-            return R.style.LightSettingsTheme;
-        } else if (selectedTheme.equals(blackTheme)) {
-            return R.style.BlackSettingsTheme;
-        } else if (selectedTheme.equals(automaticDeviceTheme)) {
-            if (isDeviceDarkThemeEnabled(context)) {
-                // use the dark theme variant preferred by the user
-                final String selectedNightTheme = getSelectedNightThemeKey(context);
-                if (selectedNightTheme.equals(blackTheme)) {
-                    return R.style.BlackSettingsTheme;
-                } else {
-                    return R.style.DarkSettingsTheme;
-                }
-            } else {
-                // there is only one day theme
-                return R.style.LightSettingsTheme;
-            }
-        } else {
-            // default to dark theme
-            return R.style.DarkSettingsTheme;
-        }
+        final String blackThemeKey = context.getString(R.string.black_theme_key);
+        return getSelectedThemeKey(context).equals(blackThemeKey)
+                ? R.style.BlackSettingsTheme : R.style.DarkSettingsTheme;
     }
 
     /**
@@ -260,11 +281,20 @@ public final class ThemeHelper {
         return context.getResources().getDimensionPixelSize(resId);
     }
 
+    private static String getSelectedAccentValue(final Context context) {
+        final String key = context.getString(R.string.accent_color_key);
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(key, context.getString(R.string.default_accent_color_value));
+    }
+
     private static String getSelectedThemeKey(final Context context) {
         final String themeKey = context.getString(R.string.theme_key);
-        final String defaultTheme = context.getString(R.string.default_theme_value);
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(themeKey, defaultTheme);
+        final String darkThemeKey = context.getString(R.string.dark_theme_key);
+        final String blackThemeKey = context.getString(R.string.black_theme_key);
+        final String storedThemeKey = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(themeKey, darkThemeKey);
+        // Old installs may still have Light or Automatic saved in preferences.
+        return storedThemeKey.equals(blackThemeKey) ? blackThemeKey : darkThemeKey;
     }
 
     private static String getSelectedNightThemeKey(final Context context) {
@@ -320,16 +350,8 @@ public final class ThemeHelper {
     }
 
     public static void setDayNightMode(final Context context, final String selectedThemeKey) {
-        final Resources res = context.getResources();
-
-        if (selectedThemeKey.equals(res.getString(R.string.light_theme_key))) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        } else if (selectedThemeKey.equals(res.getString(R.string.dark_theme_key))
-                || selectedThemeKey.equals(res.getString(R.string.black_theme_key))) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-        }
+        // Do not follow system light mode: this fork now supports Dark and Black only.
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
     }
 
     /**
@@ -379,7 +401,8 @@ public final class ThemeHelper {
             if (useGrid) {
                 result = ItemViewMode.GRID;
             } else {
-                result = ItemViewMode.LIST;
+                // Use the large, full-width video cards as the phone-first default.
+                result = ItemViewMode.CARD;
             }
         }
         return result;

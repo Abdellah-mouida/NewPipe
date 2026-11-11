@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Aurora light -->
+    <color name="np_light_background">#F7F8FB</color>
+    <color name="np_light_surface_1">#FFFFFF</color>
+    <color name="np_light_surface_2">#F0F2F7</color>
+    <color name="np_light_surface_3">#E6E9F1</color>
+    <color name="np_light_outline">#DDE1EB</color>
+    <color name="np_light_on_surface">#12141A</color>
+    <color name="np_light_on_surface_variant">#4D5566</color>
+    <color name="np_light_on_surface_subtle">#667085</color>
+    <color name="np_light_accent">#246BFD</color>
+    <color name="np_light_accent_container">#E8F0FF</color>
+    <color name="np_light_on_accent">#FFFFFF</color>
+    <color name="np_light_gradient_mid">#3B82F6</color>
+    <color name="np_light_gradient_end">#06B6D4</color>
+    <color name="np_light_glass">#E6FFFFFF</color>
+    <color name="np_light_glass_stroke">#0F000000</color>
+    <color name="np_light_ripple">#1A246BFD</color>
+    <color name="np_light_selected">#1A246BFD</color>
+    <color name="np_light_shadow">#26000000</color>
+    <color name="np_light_shimmer_base">#E6E9F1</color>
+    <color name="np_light_shimmer_highlight">#F7F8FB</color>
+
+    <!-- Aurora dark -->
+    <color name="np_dark_background">#0E1014</color>
+    <color name="np_dark_surface_1">#151821</color>
+    <color name="np_dark_surface_2">#1B1F2A</color>
+    <color name="np_dark_surface_3">#232837</color>
+    <color name="np_dark_outline">#2C3242</color>
+    <color name="np_dark_on_surface">#F2F4F8</color>
+    <color name="np_dark_on_surface_variant">#A3AABB</color>
+    <color name="np_dark_on_surface_subtle">#7D8599</color>
+    <color name="np_dark_accent">#5B9BFF</color>
+    <color name="np_dark_accent_container">#102647</color>
+    <color name="np_dark_on_accent">#FFFFFF</color>
+    <color name="np_dark_gradient_mid">#5B8CFF</color>
+    <color name="np_dark_gradient_end">#22D3EE</color>
+    <color name="np_dark_glass">#E61B1F2A</color>
+    <color name="np_dark_glass_stroke">#1AFFFFFF</color>
+    <color name="np_dark_ripple">#24FFFFFF</color>
+    <color name="np_dark_selected">#24FFFFFF</color>
+    <color name="np_dark_shadow">#82000000</color>
+    <color name="np_dark_shimmer_base">#1B1F2A</color>
+    <color name="np_dark_shimmer_highlight">#2C3242</color>
+
+    <!-- Aurora AMOLED -->
+    <color name="np_amoled_background">#000000</color>
+    <color name="np_amoled_surface_1">#08090C</color>
+    <color name="np_amoled_surface_2">#0F1115</color>
+    <color name="np_amoled_surface_3">#161922</color>
+    <color name="np_amoled_outline">#111111</color>
+    <color name="np_amoled_on_surface">#FFFFFF</color>
+    <color name="np_amoled_on_surface_variant">#9CA3B4</color>
+    <color name="np_amoled_on_surface_subtle">#7A8296</color>
+    <color name="np_amoled_accent">#4C9BFF</color>
+    <color name="np_amoled_accent_container">#0B2340</color>
+    <color name="np_amoled_on_accent">#FFFFFF</color>
+    <color name="np_amoled_gradient_mid">#62A0FF</color>
+    <color name="np_amoled_gradient_end">#2BE0F5</color>
+    <color name="np_amoled_glass">#EB0F1115</color>
+    <color name="np_amoled_glass_stroke">#1FFFFFFF</color>
+    <color name="np_amoled_shimmer_base">#0F1115</color>
+    <color name="np_amoled_shimmer_highlight">#1E222C</color>
+
+    <!-- Shared semantic states -->
+    <color name="np_success">#3DD68C</color>
+    <color name="np_warning">#FFB454</color>
+    <color name="np_error">#FF6B7A</color>
+    <color name="np_live">#FF4D5E</color>
+    <color name="np_scrim">#80000000</color>
+    <color name="np_player_scrim">#CC000000</color>
+    <color name="np_duration_scrim">#B8000000</color>
+
+    <!-- Accent palette (shared by Dark and AMOLED themes) -->
+    <color name="np_accent_blue">#2563EB</color>
+    <color name="np_accent_blue_container">#10264A</color>
+    <color name="np_accent_blue_mid">#3B82F6</color>
+    <color name="np_accent_blue_end">#1D4ED8</color>
+
+    <color name="np_accent_violet">#6D28D9</color>
+    <color name="np_accent_violet_container">#2E1065</color>
+    <color name="np_accent_violet_mid">#8B5CF6</color>
+    <color name="np_accent_violet_end">#5B21B6</color>
+
+    <color name="np_accent_red">#DC2626</color>
+    <color name="np_accent_red_container">#450A0A</color>
+    <color name="np_accent_red_mid">#EF4444</color>
+    <color name="np_accent_red_end">#991B1B</color>
+
+    <color name="np_accent_green">#15803D</color>
+    <color name="np_accent_green_container">#052E16</color>
+    <color name="np_accent_green_mid">#16A34A</color>
+    <color name="np_accent_green_end">#166534</color>
+    <color name="np_accent_on">#FFFFFF</color>
+
+</resources>

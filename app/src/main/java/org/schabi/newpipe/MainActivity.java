@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -51,12 +53,14 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -178,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbarLayoutBinding.toolbar);
+        setupFloatingToolbarBlur();
         try {
             setupDrawer();
         } catch (final Exception e) {
@@ -240,13 +245,21 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setupDrawer() throws ExtractionException {
         addDrawerMenuForCurrentService();
+        drawerLayoutBinding.navigation.setNavigationItemSelectedListener(this::drawerItemSelected);
+        setupDrawerHeader();
 
         toggle = new ActionBarDrawerToggle(this, mainBinding.getRoot(),
                 toolbarLayoutBinding.toolbar, R.string.drawer_open, R.string.drawer_close);
         toggle.syncState();
         mainBinding.getRoot().addDrawerListener(toggle);
+        prepareDrawerEntrance();
         mainBinding.getRoot().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             private int lastService;
+
+            @Override
+            public void onDrawerSlide(@NonNull final View drawerView, final float slideOffset) {
+                applyDrawerEntranceProgress(slideOffset);
+            }
 
             @Override
             public void onDrawerOpened(final View drawerView) {
@@ -255,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onDrawerClosed(final View drawerView) {
+                prepareDrawerEntrance();
                 if (servicesShown) {
                     toggleServices();
                 }
@@ -263,9 +277,90 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        drawerLayoutBinding.navigation.setNavigationItemSelectedListener(this::drawerItemSelected);
-        setupDrawerHeader();
+    private void prepareDrawerEntrance() {
+        // Start the floating drawer panel slightly scaled down and translucent.
+        // applyDrawerEntranceProgress ties the finishing animation to the drawer gesture.
+        final View drawerSurface = drawerLayoutBinding.navigation;
+        drawerSurface.animate().cancel();
+        drawerSurface.setAlpha(0.90f);
+        drawerSurface.setPivotX(drawerSurface.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
+                ? drawerSurface.getWidth() : 0f);
+        drawerSurface.setPivotY(drawerSurface.getHeight() / 2f);
+        drawerSurface.setScaleX(0.975f);
+        drawerSurface.setScaleY(0.985f);
+
+        // Keep the drawer contents hidden before the first animation frame so menu rows
+        // cannot flash in at full opacity.
+        drawerHeaderBinding.getRoot().animate().cancel();
+        drawerHeaderBinding.getRoot().setAlpha(0f);
+        drawerHeaderBinding.getRoot().setTranslationY(-dp(10));
+
+        final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
+        if (menu == null) {
+            return;
+        }
+        menu.animate().cancel();
+        menu.setAlpha(0f);
+        menu.setTranslationX(drawerMenuEntryOffset());
+        menu.setScaleX(0.985f);
+        menu.setScaleY(0.985f);
+    }
+
+    private void applyDrawerEntranceProgress(final float rawProgress) {
+        final float progress = Math.max(0f, Math.min(1f, rawProgress));
+        // Smoothstep follows the user's drag/open gesture from the first frame.
+        final float easedProgress = progress * progress * (3f - 2f * progress);
+
+        final View drawerSurface = drawerLayoutBinding.navigation;
+        drawerSurface.setPivotX(drawerSurface.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
+                ? drawerSurface.getWidth() : 0f);
+        drawerSurface.setPivotY(drawerSurface.getHeight() / 2f);
+        drawerSurface.setAlpha(0.90f + (0.10f * easedProgress));
+        drawerSurface.setScaleX(0.975f + (0.025f * easedProgress));
+        drawerSurface.setScaleY(0.985f + (0.015f * easedProgress));
+
+        final View header = drawerHeaderBinding.getRoot();
+        header.setAlpha(easedProgress);
+        header.setTranslationY(-dp(10) * (1f - easedProgress));
+
+        final RecyclerView menu = findNavigationRecyclerView(drawerLayoutBinding.navigation);
+        if (menu == null) {
+            return;
+        }
+        menu.setAlpha(easedProgress);
+        menu.setTranslationX(drawerMenuEntryOffset() * (1f - easedProgress));
+        final float scale = 0.985f + (0.015f * easedProgress);
+        menu.setScaleX(scale);
+        menu.setScaleY(scale);
+    }
+
+    private float drawerMenuEntryOffset() {
+        final boolean isRtl = drawerLayoutBinding.navigation.getLayoutDirection()
+                == View.LAYOUT_DIRECTION_RTL;
+        return isRtl ? -dp(18) : dp(18);
+    }
+
+    @Nullable
+    private RecyclerView findNavigationRecyclerView(@NonNull final View view) {
+        if (view instanceof RecyclerView) {
+            return (RecyclerView) view;
+        }
+        if (view instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                final RecyclerView found = findNavigationRecyclerView(group.getChildAt(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private int dp(final int value) {
+        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     /**
@@ -400,6 +495,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDrawerHeader() {
         drawerHeaderBinding.drawerHeaderActionButton.setOnClickListener(view -> toggleServices());
+        drawerHeaderBinding.drawerHeaderCloseButton
+                .setOnClickListener(view -> mainBinding.getRoot().closeDrawers());
 
         // If the current app name is bigger than the default "NewPipe" (7 chars),
         // let the text view grow a little more as well.
@@ -522,6 +619,7 @@ public class MainActivity extends AppCompatActivity {
         // Close drawer on return, and don't show animation,
         // so it looks like the drawer isn't open when the user returns to MainActivity
         mainBinding.getRoot().closeDrawer(GravityCompat.START, false);
+        prepareDrawerEntrance();
         try {
             final int selectedServiceId = ServiceHelper.getSelectedServiceId(this);
             final String selectedServiceName = NewPipe.getService(selectedServiceId)
@@ -862,6 +960,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (final Exception e) {
             ErrorUtil.showUiErrorSnackbar(this, "Handling intent", e);
         }
+    }
+
+    private void setupFloatingToolbarBlur() {
+        final int glassColor = ThemeHelper.resolveColorFromAttr(this, R.attr.npColorGlass);
+        toolbarLayoutBinding.toolbarBlur.setupWith(mainBinding.toolbarBlurTarget)
+                .setBlurRadius(26f)
+                .setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 108));
+        toolbarLayoutBinding.toolbarBlur.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        toolbarLayoutBinding.toolbarBlur.setClipToOutline(true);
+        toolbarLayoutBinding.toolbar.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void openMiniPlayerIfMissing() {

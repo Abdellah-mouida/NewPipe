@@ -234,6 +234,14 @@ public abstract class BaseListFragment<I, N> extends BaseStateFragment<I>
         super.initViews(rootView, savedInstanceState);
 
         itemsList = rootView.findViewById(R.id.items_list);
+        if (useAsFrontPage) {
+            itemsList.setClipToPadding(false);
+            final int navigationClearance = (int) (100f
+                    * getResources().getDisplayMetrics().density + 0.5f);
+            itemsList.setPadding(itemsList.getPaddingLeft(), itemsList.getPaddingTop(),
+                    itemsList.getPaddingRight(),
+                    itemsList.getPaddingBottom() + navigationClearance);
+        }
         refreshItemViewMode();
 
         final Supplier<View> listHeaderSupplier = getListHeaderSupplier();

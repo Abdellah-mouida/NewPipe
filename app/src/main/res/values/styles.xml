@@ -9,7 +9,7 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
     <style name="Base.OpeningTheme" parent="Base.V21.OpeningTheme">
-        <item name="android:navigationBarColor">@color/light_youtube_primary_color</item>
+        <item name="android:navigationBarColor">@color/np_light_accent</item>
     </style>
     <style name="OpeningTheme" parent="Base.OpeningTheme" />
 
@@ -24,10 +24,40 @@
 
     <!-- Light Theme -->
     <style name="Base.V21.LightTheme" parent="Base">
-        <item name="colorPrimary">@color/light_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
-        <item name="colorAccent">@color/light_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/light_background_color</item>
+        <item name="actionColor">@color/np_light_on_surface</item>
+        <item name="npColorBackground">@color/np_light_background</item>
+        <item name="npColorSurface1">@color/np_light_surface_1</item>
+        <item name="npColorSurface2">@color/np_light_surface_2</item>
+        <item name="npColorSurface3">@color/np_light_surface_3</item>
+        <item name="npColorOutline">@color/np_light_outline</item>
+        <item name="npColorOnSurface">@color/np_light_on_surface</item>
+        <item name="npColorOnSurfaceVariant">@color/np_light_on_surface_variant</item>
+        <item name="npColorOnSurfaceSubtle">@color/np_light_on_surface_subtle</item>
+        <item name="npColorAccent">@color/np_light_accent</item>
+        <item name="npColorAccentContainer">@color/np_light_accent_container</item>
+        <item name="npColorOnAccent">@color/np_light_on_accent</item>
+        <item name="npColorAccentGradientStart">@color/np_light_accent</item>
+        <item name="npColorAccentGradientMid">@color/np_light_gradient_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_light_gradient_end</item>
+        <item name="npColorScrim">@color/np_scrim</item>
+        <item name="npColorGlass">@color/np_light_glass</item>
+        <item name="npColorGlassStroke">@color/np_light_glass_stroke</item>
+        <item name="npColorSuccess">@color/np_success</item>
+        <item name="npColorWarning">@color/np_warning</item>
+        <item name="npColorError">@color/np_error</item>
+        <item name="npColorLive">@color/np_live</item>
+        <item name="npColorShimmerBase">@color/np_light_shimmer_base</item>
+        <item name="npColorShimmerHighlight">@color/np_light_shimmer_highlight</item>
+        <item name="npColorPlayerScrim">@color/np_player_scrim</item>
+
+        <item name="colorPrimary">@color/np_light_accent</item>
+        <item name="colorPrimaryDark">@color/np_light_accent</item>
+        <item name="colorAccent">@color/np_light_accent</item>
+        <item name="android:windowBackground">@color/np_light_background</item>
+        <item name="android:statusBarColor">@color/np_light_background</item>
+        <item name="android:navigationBarColor">@color/np_light_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="windowBackground">@color/light_background_color</item>
 
         <item name="separator_color">@color/light_separator_color</item>
@@ -42,16 +72,47 @@
         <item name="card_item_contrast_color">@color/light_card_item_contrast_color</item>
         <item name="border_color">@color/light_border_color</item>
         <item name="dashed_border">@drawable/dashed_border_light</item>
+            <item name="toolbarSearchColor">@color/np_light_on_surface</item>
     </style>
     <style name="Base.LightTheme" parent="Base.V21.LightTheme" />
     <style name="LightTheme" parent="Base.LightTheme"/>
 
     <!-- Dark Theme -->
     <style name="Base.V21.DarkTheme" parent="Base">
-        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
-        <item name="colorAccent">@color/dark_youtube_accent_color</item>
-        <item name="android:windowBackground">@color/dark_background_color</item>
+        <item name="actionColor">@color/np_dark_on_surface</item>
+        <item name="npColorBackground">@color/np_dark_background</item>
+        <item name="npColorSurface1">@color/np_dark_surface_1</item>
+        <item name="npColorSurface2">@color/np_dark_surface_2</item>
+        <item name="npColorSurface3">@color/np_dark_surface_3</item>
+        <item name="npColorOutline">@color/np_dark_outline</item>
+        <item name="npColorOnSurface">@color/np_dark_on_surface</item>
+        <item name="npColorOnSurfaceVariant">@color/np_dark_on_surface_variant</item>
+        <item name="npColorOnSurfaceSubtle">@color/np_dark_on_surface_subtle</item>
+        <item name="npColorAccent">@color/np_dark_accent</item>
+        <item name="npColorAccentContainer">@color/np_dark_accent_container</item>
+        <item name="npColorOnAccent">@color/np_dark_on_accent</item>
+        <item name="npColorAccentGradientStart">@color/np_dark_accent</item>
+        <item name="npColorAccentGradientMid">@color/np_dark_gradient_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_dark_gradient_end</item>
+        <item name="npColorScrim">@color/np_scrim</item>
+        <item name="npColorGlass">@color/np_dark_glass</item>
+        <item name="npColorGlassStroke">@color/np_dark_glass_stroke</item>
+        <item name="npColorSuccess">@color/np_success</item>
+        <item name="npColorWarning">@color/np_warning</item>
+        <item name="npColorError">@color/np_error</item>
+        <item name="npColorLive">@color/np_live</item>
+        <item name="npColorShimmerBase">@color/np_dark_shimmer_base</item>
+        <item name="npColorShimmerHighlight">@color/np_dark_shimmer_highlight</item>
+        <item name="npColorPlayerScrim">@color/np_player_scrim</item>
+
+        <item name="colorPrimary">@color/np_dark_accent</item>
+        <item name="colorPrimaryDark">@color/np_dark_accent</item>
+        <item name="colorAccent">@color/np_dark_accent</item>
+        <item name="android:windowBackground">@color/np_dark_background</item>
+        <item name="android:statusBarColor">@color/np_dark_background</item>
+        <item name="android:navigationBarColor">@color/np_dark_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
         <item name="windowBackground">@color/dark_background_color</item>
 
         <item name="separator_color">@color/dark_separator_color</item>
@@ -66,13 +127,47 @@
         <item name="card_item_contrast_color">@color/dark_card_item_contrast_color</item>
         <item name="border_color">@color/dark_border_color</item>
         <item name="dashed_border">@drawable/dashed_border_dark</item>
+            <item name="toolbarSearchColor">@color/np_dark_on_surface</item>
     </style>
     <style name="Base.DarkTheme" parent="Base.V21.DarkTheme" />
     <style name="DarkTheme" parent="Base.DarkTheme"/>
 
     <!-- Black Theme -->
     <style name="Base.V21.BlackTheme" parent="DarkTheme">
-        <item name="android:windowBackground">@color/black_background_color</item>
+        <item name="colorPrimary">@color/np_amoled_accent</item>
+        <item name="colorPrimaryDark">@color/np_amoled_accent</item>
+        <item name="colorAccent">@color/np_amoled_accent</item>
+        <item name="actionColor">@color/np_amoled_on_surface</item>
+        <item name="npColorBackground">@color/np_amoled_background</item>
+        <item name="npColorSurface1">@color/np_amoled_surface_1</item>
+        <item name="npColorSurface2">@color/np_amoled_surface_2</item>
+        <item name="npColorSurface3">@color/np_amoled_surface_3</item>
+        <item name="npColorOutline">@color/np_amoled_outline</item>
+        <item name="npColorOnSurface">@color/np_amoled_on_surface</item>
+        <item name="npColorOnSurfaceVariant">@color/np_amoled_on_surface_variant</item>
+        <item name="npColorOnSurfaceSubtle">@color/np_amoled_on_surface_subtle</item>
+        <item name="npColorAccent">@color/np_amoled_accent</item>
+        <item name="npColorAccentContainer">@color/np_amoled_accent_container</item>
+        <item name="npColorOnAccent">@color/np_amoled_on_accent</item>
+        <item name="npColorAccentGradientStart">@color/np_amoled_accent</item>
+        <item name="npColorAccentGradientMid">@color/np_amoled_gradient_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_amoled_gradient_end</item>
+        <item name="npColorScrim">@color/np_scrim</item>
+        <item name="npColorGlass">@color/np_amoled_glass</item>
+        <item name="npColorGlassStroke">@color/np_amoled_glass_stroke</item>
+        <item name="npColorSuccess">@color/np_success</item>
+        <item name="npColorWarning">@color/np_warning</item>
+        <item name="npColorError">@color/np_error</item>
+        <item name="npColorLive">@color/np_live</item>
+        <item name="npColorShimmerBase">@color/np_amoled_shimmer_base</item>
+        <item name="npColorShimmerHighlight">@color/np_amoled_shimmer_highlight</item>
+        <item name="npColorPlayerScrim">@color/np_player_scrim</item>
+
+        <item name="android:windowBackground">@color/np_amoled_background</item>
+        <item name="android:statusBarColor">@color/np_amoled_background</item>
+        <item name="android:navigationBarColor">@color/np_amoled_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
         <item name="windowBackground">@color/black_background_color</item>
 
         <item name="separator_color">@color/black_separator_color</item>
@@ -82,39 +177,40 @@
         <item name="card_item_contrast_color">@color/black_card_item_contrast_color</item>
         <item name="border_color">@color/black_border_color</item>
         <item name="dashed_border">@drawable/dashed_border_black</item>
+            <item name="toolbarSearchColor">@color/np_amoled_on_surface</item>
     </style>
     <style name="Base.BlackTheme" parent="Base.V21.BlackTheme" />
     <style name="BlackTheme" parent="Base.BlackTheme"/>
 
     <!-- Dialogs -->
     <style name="LightDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorPrimary">@color/light_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
-        <item name="colorAccent">@color/light_youtube_accent_color</item>
+        <item name="colorPrimary">@color/np_light_accent</item>
+        <item name="colorPrimaryDark">@color/np_light_accent</item>
+        <item name="colorAccent">@color/np_light_accent</item>
         <item name="android:windowBackground">@color/light_dialog_background_color</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
-        <item name="colorAccent">@color/dark_youtube_accent_color</item>
+        <item name="colorPrimary">@color/np_dark_accent</item>
+        <item name="colorPrimaryDark">@color/np_dark_accent</item>
+        <item name="colorAccent">@color/np_dark_accent</item>
         <item name="android:windowBackground">@color/dark_dialog_background_color</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
     </style>
 
     <style name="LightDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
-        <item name="colorPrimary">@color/light_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/light_youtube_primary_color</item>
-        <item name="colorAccent">@color/light_youtube_accent_color</item>
+        <item name="colorPrimary">@color/np_light_accent</item>
+        <item name="colorPrimaryDark">@color/np_light_accent</item>
+        <item name="colorAccent">@color/np_light_accent</item>
         <item name="android:windowBackground">@color/light_dialog_background_color</item>
         <item name="windowBackground">@color/light_dialog_background_color</item>
     </style>
 
     <style name="DarkDialogMinWidthTheme" parent="Theme.AppCompat.DayNight.Dialog.MinWidth">
-        <item name="colorPrimary">@color/dark_youtube_primary_color</item>
-        <item name="colorPrimaryDark">@color/dark_youtube_primary_color</item>
-        <item name="colorAccent">@color/dark_youtube_accent_color</item>
+        <item name="colorPrimary">@color/np_dark_accent</item>
+        <item name="colorPrimaryDark">@color/np_dark_accent</item>
+        <item name="colorAccent">@color/np_dark_accent</item>
         <item name="android:windowBackground">@color/dark_dialog_background_color</item>
         <item name="windowBackground">@color/dark_dialog_background_color</item>
     </style>
@@ -154,5 +250,86 @@
     </style>
 
     <style name="RouterActivityThemeDark" parent="Base.RouterActivityThemeDark" />
+
+
+    <!-- User-selectable accent palettes. Semantic success/error colors remain independent. -->
+    <style name="AccentColorBlue">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorPrimaryDark">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+        <item name="npColorAccent">@color/np_accent_blue</item>
+        <item name="npColorAccentContainer">@color/np_accent_blue_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_blue</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_blue_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_blue_end</item>
+    </style>
+    <style name="AccentColorViolet">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorPrimaryDark">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+        <item name="npColorAccent">@color/np_accent_violet</item>
+        <item name="npColorAccentContainer">@color/np_accent_violet_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_violet</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_violet_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_violet_end</item>
+    </style>
+    <style name="AccentColorRed">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorPrimaryDark">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+        <item name="npColorAccent">@color/np_accent_red</item>
+        <item name="npColorAccentContainer">@color/np_accent_red_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_red</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_red_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_red_end</item>
+    </style>
+    <style name="AccentColorGreen">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorPrimaryDark">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+        <item name="npColorAccent">@color/np_accent_green</item>
+        <item name="npColorAccentContainer">@color/np_accent_green_container</item>
+        <item name="npColorOnAccent">@color/np_accent_on</item>
+        <item name="npColorAccentGradientStart">@color/np_accent_green</item>
+        <item name="npColorAccentGradientMid">@color/np_accent_green_mid</item>
+        <item name="npColorAccentGradientEnd">@color/np_accent_green_end</item>
+    </style>
+
+    <!-- Dialog variants keep the selected accent consistent with the activity theme. -->
+    <style name="DarkDialogTheme.Blue" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+    </style>
+    <style name="DarkDialogTheme.Violet" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+    </style>
+    <style name="DarkDialogTheme.Red" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+    </style>
+    <style name="DarkDialogTheme.Green" parent="DarkDialogTheme">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Blue" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_blue</item>
+        <item name="colorAccent">@color/np_accent_blue</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Violet" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_violet</item>
+        <item name="colorAccent">@color/np_accent_violet</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Red" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_red</item>
+        <item name="colorAccent">@color/np_accent_red</item>
+    </style>
+    <style name="DarkDialogMinWidthTheme.Green" parent="DarkDialogMinWidthTheme">
+        <item name="colorPrimary">@color/np_accent_green</item>
+        <item name="colorAccent">@color/np_accent_green</item>
+    </style>
 
 </resources>

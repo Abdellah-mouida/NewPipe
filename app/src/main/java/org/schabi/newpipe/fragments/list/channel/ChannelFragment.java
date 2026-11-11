@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,6 +90,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
     private SubscriptionManager subscriptionManager;
     private int lastTab;
     private boolean channelContentNotSupported = false;
+    private boolean channelHeaderAnimated;
 
     /*//////////////////////////////////////////////////////////////////////////
     // Views
@@ -578,6 +580,7 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
     @Override
     public void showLoading() {
         super.showLoading();
+        channelHeaderAnimated = false;
         CoilUtils.dispose(binding.channelAvatarView);
         CoilUtils.dispose(binding.channelBannerImage);
         CoilUtils.dispose(binding.subChannelAvatarView);
@@ -638,6 +641,49 @@ public class ChannelFragment extends BaseStateFragment<ChannelInfo>
         updateTabs();
         updateSubscription(result);
         monitorSubscription(result);
+        animateChannelProfile();
+    }
+
+    /**
+     * Stagger the channel profile elements into place after the extractor result is ready.
+     * Uses ViewPropertyAnimator APIs supported on the app's minimum Android version.
+     */
+    private void animateChannelProfile() {
+        if (channelHeaderAnimated || binding == null) {
+            return;
+        }
+        channelHeaderAnimated = true;
+
+        animateProfileView(binding.channelMetadata, 0L, 0.985f);
+        animateProfileView(binding.channelAvatarView, 70L, 0.90f);
+        animateProfileView(binding.channelTitleView, 110L, 0.97f);
+        animateProfileView(binding.subChannelTitleView, 150L, 0.97f);
+        animateProfileView(binding.channelSubscriberView, 180L, 0.97f);
+        animateProfileView(binding.tabLayout, 210L, 0.99f);
+    }
+
+    private void animateProfileView(@Nullable final View view,
+                                    final long delay,
+                                    final float initialScale) {
+        if (view == null || view.getVisibility() != View.VISIBLE) {
+            return;
+        }
+
+        view.animate().cancel();
+        view.setAlpha(0f);
+        view.setTranslationY(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 10f, getResources().getDisplayMetrics()));
+        view.setScaleX(initialScale);
+        view.setScaleY(initialScale);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setStartDelay(delay)
+                .setDuration(360L)
+                .setInterpolator(new DecelerateInterpolator(1.6f))
+                .start();
     }
 
     private void showContentNotSupportedIfNeeded() {

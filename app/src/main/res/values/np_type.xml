@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.Np.Display" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="TextAppearance.Np.TitleLarge" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="TextAppearance.Np.TitleMedium" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="TextAppearance.Np.TitleSmall" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="TextAppearance.Np.BodyLarge" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+    </style>
+    <style name="TextAppearance.Np.BodyMedium" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+    </style>
+    <style name="TextAppearance.Np.BodySmall" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?attr/npColorOnSurfaceVariant</item>
+    </style>
+    <style name="TextAppearance.Np.LabelLarge" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurface</item>
+    </style>
+    <style name="TextAppearance.Np.LabelMedium" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/npColorOnSurfaceVariant</item>
+    </style>
+    <style name="TextAppearance.Np.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?attr/npColorOnSurfaceSubtle</item>
+    </style>
+    <style name="TextAppearance.Np.Tabular" parent="TextAppearance.Np.BodySmall">
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+</resources>

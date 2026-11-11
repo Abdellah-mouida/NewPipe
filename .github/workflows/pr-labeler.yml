@@ -6,7 +6,7 @@ permissions:
 
 jobs:
   changed-lines-count-labeler:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Automatically labelling pull requests based on the changed lines count
     permissions:
       pull-requests: write

@@ -13,15 +13,16 @@
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
 
+
     <ListPreference
-        android:defaultValue="@string/default_night_theme_value"
-        android:entries="@array/night_theme_description_list"
-        android:entryValues="@array/night_theme_values_list"
-        android:key="@string/night_theme_key"
-        android:summary="@string/night_theme_summary"
-        android:title="@string/night_theme_title"
+        android:defaultValue="@string/default_accent_color_value"
+        android:entries="@array/accent_color_description_list"
+        android:entryValues="@array/accent_color_values_list"
+        android:key="@string/accent_color_key"
+        android:title="@string/accent_color_title"
         app:singleLineTitle="false"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
@@ -58,12 +59,5 @@
         app:singleLineTitle="false"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
-        android:defaultValue="false"
-        android:key="@string/main_tabs_position_key"
-        android:summary="@string/main_tabs_position_summary"
-        android:title="@string/main_tabs_position_title"
-        app:singleLineTitle="false"
-        app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

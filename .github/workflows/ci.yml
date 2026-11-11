@@ -1,143 +1,408 @@
-name: CI
+name: Android CI
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - master
+      - premium
+      - 'redesign/**'
+    # The release job bumps only this file after publishing. Do not start a
+    # second CI/release cycle for that bot-generated version-only commit.
+    paths-ignore:
+      - buildSrc/src/main/kotlin/ProjectConfig.kt
+
   pull_request:
     branches:
       - dev
       - master
       - refactor
-      - release**
-    paths-ignore:
-      - 'README.md'
-      - 'doc/**'
-      - 'fastlane/**'
-      - 'assets/**'
-      - '.github/**/*.md'
-      - '.github/FUNDING.yml'
-      - '.github/ISSUE_TEMPLATE/**'
-  push:
-    branches:
-      - dev
-      - master
-    paths-ignore:
-      - 'README.md'
-      - 'doc/**'
-      - 'fastlane/**'
-      - 'assets/**'
-      - '.github/**/*.md'
-      - '.github/FUNDING.yml'
-      - '.github/ISSUE_TEMPLATE/**'
+      - premium
+      - 'release**'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-test-jvm:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
+  build:
+    name: Build, lint and unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
 
     steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v6
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-      - name: create and checkout branch
-        # push events already checked out the branch
-        if: github.event_name == 'pull_request'
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: git checkout -B "$BRANCH"
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v6
 
-      - name: set up JDK
-        uses: actions/setup-java@v5
+      - name: Set up Java 21
+        uses: actions/setup-java@v6
         with:
-          java-version: 21
-          distribution: "temurin"
-          cache: 'gradle'
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
 
-      - name: Build debug APK and run jvm tests
-        run: ./gradlew assembleContinuous lintContinuous testDebugUnitTest --stacktrace -DskipFormatKtlint
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK 37.0
+        run: |
+          set -euo pipefail
+          sdkmanager --install "platforms;android-37.0" "build-tools;37.0.0"
+          test -d "$ANDROID_HOME/platforms/android-37.0"
+          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
+            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          fi
+
+      - name: Show build environment
+        run: |
+          java -version
+          ./gradlew --version
+
+      - name: Build, lint and run unit tests
+        run: |
+          ./gradlew --no-daemon \
+            assembleContinuous \
+            lintContinuous \
+            testDebugUnitTest \
+            --stacktrace \
+            -DskipFormatKtlint
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: app
+          name: newpipe-apk-${{ github.run_number }}
           path: app/build/outputs/apk/continuous/*.apk
+          if-no-files-found: error
+          retention-days: 14
 
-  test-android:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-reports-${{ github.run_number }}
+          path: |
+            app/build/reports/**
+            app/build/test-results/**
+          if-no-files-found: ignore
+          retention-days: 14
+
+  android-tests:
+    name: Android emulator tests
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+
     strategy:
+      fail-fast: false
       matrix:
         include:
           - api-level: 23
             target: default
             arch: x86
+
+          # Match the affected Huawei / Android 8.1 device API level.
+          - api-level: 27
+            target: default
+            arch: x86
+
           - api-level: 35
             target: default
             arch: x86_64
 
-    permissions:
-      contents: read
-
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install compile SDK 37.0
+        run: |
+          set -euo pipefail
+          sdkmanager --install "platforms;android-37.0" "build-tools;37.0.0"
+          test -d "$ANDROID_HOME/platforms/android-37.0"
+          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
+            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          fi
 
       - name: Enable KVM
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
+            sudo tee /etc/udev/rules.d/99-kvm4all.rules
+
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: set up JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: 21
-          distribution: "temurin"
-          cache: 'gradle'
-
-      - name: Run android tests
+      - name: Run Android tests and smoke-test Android 8.1 startup
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           arch: ${{ matrix.arch }}
-          script: ./gradlew connectedCheck --stacktrace
+          disable-animations: true
+          # Keep this as one command: android-emulator-runner executes its
+          # script input via /bin/sh and does not reliably preserve multiline blocks.
+          script: sh .github/scripts/run-emulator-tests.sh "${{ matrix.api-level }}"
 
-      - name: Upload test report when tests fail # because the printed out stacktrace (console) is too short, see also #7553
+      - name: Upload emulator test reports
+        if: always()
         uses: actions/upload-artifact@v7
-        if: failure()
         with:
-          name: android-test-report-api${{ matrix.api-level }}
-          path: app/build/reports/androidTests/connected/**
+          name: emulator-reports-api${{ matrix.api-level }}
+          path: |
+            app/build/reports/androidTests/connected/**
+            app/build/reports/tests/**
+          if-no-files-found: ignore
+          retention-days: 14
 
-  sonar:
-    if: ${{ false }} # the key has expired and needs to be regenerated by the sonar admins
-    runs-on: ubuntu-latest
 
+  publish-stable:
+    name: Publish signed release and bump next version
+    needs: [build, android-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/premium' && needs.build.result == 'success' && needs.android-tests.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     permissions:
-      contents: read
+      contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout tested commit
+        uses: actions/checkout@v7
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          ref: ${{ github.sha }}
 
-      - name: Set up JDK
-        uses: actions/setup-java@v5
+      - name: Ensure this tested commit is still the branch head
+        id: head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Release skipped"
+              echo
+              echo "A newer commit reached \`$GITHUB_REF_NAME\` while this CI run was executing."
+              echo "The newer commit will be released by its own successful CI run."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Set up Java 21
+        if: steps.head.outputs.current == 'true'
+        uses: actions/setup-java@v6
         with:
-          java-version: 21
-          distribution: "temurin"
-          cache: 'gradle'
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v5
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Set up Android SDK
+        if: steps.head.outputs.current == 'true'
+        uses: android-actions/setup-android@v4
 
-      - name: Build and analyze
+      - name: Install Android SDK 37.0
+        if: steps.head.outputs.current == 'true'
+        run: |
+          set -euo pipefail
+          sdkmanager --install "platforms;android-37.0" "build-tools;37.0.0"
+          test -d "$ANDROID_HOME/platforms/android-37.0"
+          if [[ ! -e "$ANDROID_HOME/platforms/android-37" ]]; then
+            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          fi
+
+      - name: Require Android release signing secrets
+        if: steps.head.outputs.current == 'true'
+        id: signing
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonar --info
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          present=0
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -n "${!name:-}" ]]; then
+              present=$((present + 1))
+            fi
+          done
+
+          if [[ "$present" != "4" ]]; then
+            echo "All four Android signing secrets are required for an automatic stable release." >&2
+            echo "Required: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD." >&2
+            exit 1
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
+      - name: Restore release keystore
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/newpipe-release.jks"
+          chmod 600 "$RUNNER_TEMP/newpipe-release.jks"
+          test -s "$RUNNER_TEMP/newpipe-release.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/newpipe-release.jks" >> "$GITHUB_ENV"
+
+      - name: Build signed release APK and AAB
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/newpipe-release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew --no-daemon assembleRelease bundleRelease --stacktrace
+
+      - name: Verify and name release packages
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk_dir="app/build/outputs/apk/release"
+          bundle_dir="app/build/outputs/bundle/release"
+          version_name="$(jq -r '.elements[0].versionName' "$apk_dir/output-metadata.json")"
+          apk="$(find "$apk_dir" -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          aab="$(find "$bundle_dir" -maxdepth 1 -type f -name '*.aab' -print -quit)"
+          test -n "$apk"
+          test -n "$aab"
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --verbose "$apk"
+          mv "$apk" "NewPipe-v${version_name}.apk"
+          mv "$aab" "NewPipe-v${version_name}.aab"
+          echo "VERSION_NAME=$version_name" >> "$GITHUB_ENV"
+
+      - name: Recheck branch head before publishing
+        if: steps.head.outputs.current == 'true' && steps.signing.outputs.enabled == 'true'
+        id: publish-head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" == "$GITHUB_SHA" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "A newer commit arrived during the release build; skipping this publication." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish stable GitHub release
+        if: steps.publish-head.outputs.current == 'true'
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v${VERSION_NAME}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $tag already exists; refusing to overwrite it or bump the version." >> "$GITHUB_STEP_SUMMARY"
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          else
+            # A tag can exist without a GitHub Release. Only in that case,
+            # point it at the exact commit that passed CI before publishing.
+            git tag --force "$tag" "$GITHUB_SHA"
+            git push --force origin "refs/tags/${tag}"
+
+            gh release create "$tag" \
+              "NewPipe-v${VERSION_NAME}.apk" \
+              "NewPipe-v${VERSION_NAME}.aab" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe ${VERSION_NAME}" \
+              --latest \
+              --notes "Stable release of the NewPipe redesign fork.
+
+          - Source branch: premium
+          - Tested commit: $GITHUB_SHA
+          - Build, lint, and unit tests passed.
+          - Android emulator checks passed on API 23, 27, and 35.
+          - Launcher icon aliases resolve against each variant application ID.
+          - APK and AAB are signed with this fork's release key.
+
+          This is an unofficial fork of TeamNewPipe/NewPipe. Back up your data before switching from a differently signed NewPipe installation."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump version for the next development cycle
+        if: steps.publish-head.outputs.current == 'true' && steps.release.outputs.published == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Do not overwrite a newer commit if the branch advanced after publication.
+          git fetch origin "$GITHUB_REF_NAME"
+          latest_sha="$(git rev-parse FETCH_HEAD)"
+          if [[ "$latest_sha" != "$GITHUB_SHA" ]]; then
+            echo "Branch advanced after publication; leaving its version file untouched." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+
+          path = Path("buildSrc/src/main/kotlin/ProjectConfig.kt")
+          source = path.read_text(encoding="utf-8")
+
+          version_pattern = re.compile(
+              r'(?m)^const val NEWPIPE_VERSION_NAME = "(\d+)\.(\d+)\.(\d+)"$'
+          )
+          code_pattern = re.compile(r"(?m)^const val NEWPIPE_VERSION_CODE = (\d+)$")
+
+          version_match = version_pattern.search(source)
+          code_match = code_pattern.search(source)
+          if not version_match or not code_match:
+              raise SystemExit("Could not safely parse the app version and version code.")
+
+          major, minor, patch = map(int, version_match.groups())
+          next_version = f"{major}.{minor}.{patch + 1}"
+          next_code = int(code_match.group(1)) + 1
+
+          source = version_pattern.sub(
+              f'const val NEWPIPE_VERSION_NAME = "{next_version}"',
+              source,
+              count=1,
+          )
+          source = code_pattern.sub(
+              f"const val NEWPIPE_VERSION_CODE = {next_code}",
+              source,
+              count=1,
+          )
+          path.write_text(source, encoding="utf-8")
+          print(f"Prepared next development version: {next_version} (code {next_code})")
+          PY
+
+          next_version="$(sed -n 's/^const val NEWPIPE_VERSION_NAME = "\(.*\)"/\1/p' buildSrc/src/main/kotlin/ProjectConfig.kt)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add buildSrc/src/main/kotlin/ProjectConfig.kt
+          git commit -m "chore(release): prepare v${next_version}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+
+          {
+            echo "## Automatic release published"
+            echo
+            echo "- Published release: [v${VERSION_NAME}](https://github.com/${GITHUB_REPOSITORY}/releases/tag/v${VERSION_NAME})"
+            echo "- Next development version: ${next_version}"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,64 @@
+name: Publish Redesign Preview Release
+
+# One-time publication of the already-validated CI build.
+on:
+  push:
+    branches:
+      - redesign/premium-ui
+    paths:
+      - .github/workflows/publish-redesign-preview.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    name: Publish preview APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Download the successful Android CI artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: newpipe-apk-5
+          run-id: 42215261176
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release-assets
+
+      - name: Prepare APK and record checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk_path="$(find release-assets -type f -name '*.apk' -print -quit)"
+          test -n "$apk_path"
+          cp "$apk_path" "NewPipe-Redesign-v0.29.1-preview.1.apk"
+          sha256sum "NewPipe-Redesign-v0.29.1-preview.1.apk" | tee apk-sha256.txt
+          {
+            echo "## APK prepared"
+            echo
+            cat apk-sha256.txt
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create GitHub pre-release and upload APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "redesign-v0.29.1-preview.1" \
+            "NewPipe-Redesign-v0.29.1-preview.1.apk" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "d1761e108a10f8774ff52958a057877563c35291" \
+            --title "NewPipe Redesign Preview v0.29.1" \
+            --prerelease \
+            --latest=false \
+            --notes "Experimental preview of the redesign from branch `redesign/premium-ui`.
+
+          - Source commit: d1761e108a10f8774ff52958a057877563c35291
+          - Android CI run: https://github.com/Abdellah-mouida/NewPipe/actions/runs/42215261176
+          - Build variant: Continuous (debug-signed)
+          - Build, lint, unit tests, and both emulator test jobs passed.
+
+          This is a testing preview, not a stable or production-signed release."

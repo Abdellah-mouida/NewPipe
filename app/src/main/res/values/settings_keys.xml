@@ -257,19 +257,15 @@
     <string name="dark_theme_key">dark_theme</string>
     <string name="black_theme_key">black_theme</string>
     <string name="auto_device_theme_key">auto_device_theme</string>
-    <string name="default_theme_value">@string/auto_device_theme_key</string>
-    <string name="default_night_theme_value">@string/dark_theme_key</string>
+    <string name="default_theme_value">@string/dark_theme_key</string>
+    <string name="default_night_theme_value">@string/black_theme_key</string>
     <string-array name="theme_values_list">
-        <item>@string/light_theme_key</item>
         <item>@string/dark_theme_key</item>
         <item>@string/black_theme_key</item>
-        <item>@string/auto_device_theme_key</item>
     </string-array>
     <string-array name="theme_description_list">
-        <item>@string/light_theme_title</item>
         <item>@string/dark_theme_title</item>
         <item>@string/black_theme_title</item>
-        <item>@string/auto_device_theme_title</item>
     </string-array>
     <string-array name="night_theme_values_list">
         <item>@string/dark_theme_key</item>
@@ -278,6 +274,16 @@
     <string-array name="night_theme_description_list">
         <item>@string/dark_theme_title</item>
         <item>@string/black_theme_title</item>
+    </string-array>
+
+
+    <string name="accent_color_key">accent_color</string>
+    <string name="default_accent_color_value">blue</string>
+    <string-array name="accent_color_values_list">
+        <item>blue</item>
+        <item>violet</item>
+        <item>red</item>
+        <item>green</item>
     </string-array>
 
     <!-- Caption Size -->
@@ -1421,7 +1427,7 @@
     </string-array>
 
     <string name="list_view_mode_key">list_view_mode</string>
-    <string name="list_view_mode_value">@string/list_view_mode_auto_key</string>
+    <string name="list_view_mode_value">@string/list_view_mode_card_key</string>
 
     <!-- TODO: Use these across the app instead of hardcoding it -->
     <string name="list_view_mode_auto_key">auto</string>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1200" height="420" viewBox="0 0 1200 420"
+     role="img" aria-labelledby="title desc">
+  <title id="title">NewPipe Premium UI</title>
+  <desc id="desc">An animated dark banner introducing an unofficial NewPipe interface redesign.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080B12"/>
+      <stop offset="0.58" stop-color="#101827"/>
+      <stop offset="1" stop-color="#090D16"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#348EFF"/>
+      <stop offset="1" stop-color="#8B6CFF"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#348EFF" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#348EFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="28"/>
+    </filter>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#FFFFFF" stroke-opacity=".045" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="420" rx="30" fill="url(#bg)"/>
+  <rect width="1200" height="420" rx="30" fill="url(#grid)"/>
+  <ellipse cx="1020" cy="60" rx="280" ry="205" fill="url(#glow)" filter="url(#soft)">
+    <animate attributeName="rx" values="260;310;260" dur="12s" repeatCount="indefinite"/>
+  </ellipse>
+  <circle cx="1040" cy="210" r="132" fill="none" stroke="#348EFF" stroke-opacity=".11" stroke-width="1.5">
+    <animate attributeName="r" values="120;145;120" dur="9s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1040" cy="210" r="92" fill="none" stroke="#8B6CFF" stroke-opacity=".18" stroke-width="1.5"/>
+  <path d="M720 420C850 300 905 170 1200 130" fill="none" stroke="url(#accent)" stroke-width="2" stroke-opacity=".65" stroke-dasharray="10 18">
+    <animate attributeName="stroke-dashoffset" values="0;-112" dur="8s" repeatCount="indefinite"/>
+  </path>
+
+  <g transform="translate(78 68)">
+    <rect x="0" y="0" width="226" height="34" rx="17" fill="#348EFF" fill-opacity=".13" stroke="#348EFF" stroke-opacity=".38"/>
+    <circle cx="18" cy="17" r="4" fill="#55A5FF"/>
+    <text x="34" y="22" fill="#A9CCFF" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2.2">UNOFFICIAL ANDROID FORK</text>
+
+    <text x="0" y="128" fill="#F5F7FC" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="76" font-weight="750" letter-spacing="-3">NewPipe</text>
+    <text x="3" y="181" fill="url(#accent)" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="31" font-weight="700" letter-spacing="5">PREMIUM UI</text>
+    <text x="3" y="226" fill="#AAB5C8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">A calmer, sharper interface for the NewPipe experience.</text>
+
+    <g transform="translate(0 278)">
+      <rect x="0" y="0" width="154" height="42" rx="21" fill="#FFFFFF" fill-opacity=".055" stroke="#FFFFFF" stroke-opacity=".12"/>
+      <text x="77" y="26" fill="#E5EAF4" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="650" letter-spacing="1">AMOLED BLACK</text>
+      <rect x="168" y="0" width="144" height="42" rx="21" fill="#348EFF" fill-opacity=".13" stroke="#348EFF" stroke-opacity=".3"/>
+      <text x="240" y="26" fill="#B7D7FF" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="650" letter-spacing="1">BLUE-LED UI</text>
+      <rect x="326" y="0" width="156" height="42" rx="21" fill="#8B6CFF" fill-opacity=".12" stroke="#8B6CFF" stroke-opacity=".3"/>
+      <text x="404" y="26" fill="#D4C9FF" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="650" letter-spacing="1">SMOOTH MOTION</text>
+    </g>
+  </g>
+</svg>

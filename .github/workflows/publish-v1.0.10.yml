@@ -1,0 +1,178 @@
+name: Build and publish NewPipe v1.0.10
+
+on:
+  push:
+    branches:
+      - premium
+    paths:
+      - buildSrc/src/main/kotlin/ProjectConfig.kt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-newpipe-v1.0.10
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build APK and publish release assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out premium
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK 37.0
+        run: |
+          android sdk install \
+            platforms/android-37.0 \
+            build-tools/37.0.0
+
+      - name: Check release signing secrets
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          present=0
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -n "${!name:-}" ]]; then
+              present=$((present + 1))
+            fi
+          done
+          if [[ "$present" == "4" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Production signing secrets are incomplete. The workflow will publish a debug-signed continuous APK as a prerelease." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Restore release keystore
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/newpipe-release.jks"
+          chmod 600 "$RUNNER_TEMP/newpipe-release.jks"
+          test -s "$RUNNER_TEMP/newpipe-release.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/newpipe-release.jks" >> "$GITHUB_ENV"
+
+      - name: Build production APK and AAB
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/newpipe-release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon assembleRelease bundleRelease --stacktrace
+
+      - name: Build continuous APK
+        if: steps.signing.outputs.enabled != 'true'
+        run: ./gradlew --no-daemon assembleContinuous --stacktrace
+
+      - name: Prepare APK and source ZIP
+        id: assets
+        env:
+          SIGNING_ENABLED: ${{ steps.signing.outputs.enabled }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+
+          if [[ "$SIGNING_ENABLED" == "true" ]]; then
+            apk="$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print -quit)"
+            aab="$(find app/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' -print -quit)"
+            test -n "$apk"
+            test -n "$aab"
+            "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --verbose "$apk"
+            cp "$apk" release-assets/NewPipe-v1.0.10.apk
+            cp "$aab" release-assets/NewPipe-v1.0.10.aab
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            apk="$(find app/build/outputs/apk/continuous -maxdepth 1 -type f -name '*.apk' -print -quit)"
+            test -n "$apk"
+            cp "$apk" release-assets/NewPipe-v1.0.10.apk
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          git archive --format=zip --output=release-assets/NewPipe-v1.0.10-source.zip HEAD
+          (cd release-assets && sha256sum NewPipe-v1.0.10.apk NewPipe-v1.0.10-source.zip > SHA256SUMS.txt)
+          if [[ -f release-assets/NewPipe-v1.0.10.aab ]]; then
+            (cd release-assets && sha256sum NewPipe-v1.0.10.aab >> SHA256SUMS.txt)
+          fi
+
+      - name: Publish GitHub release and attach APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ steps.assets.outputs.prerelease }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$PRERELEASE" == "true" ]]; then
+            cat > release-notes.md <<'NOTES'
+          Unofficial NewPipe UI fork release 1.0.10.
+
+          This package was built with the Continuous variant and is debug-signed because production signing secrets were not configured. Android may require uninstalling another NewPipe build before installing it. The source ZIP and SHA256 checksums are attached.
+          NOTES
+          else
+            cat > release-notes.md <<'NOTES'
+          Unofficial NewPipe UI fork release 1.0.10.
+
+          Production-signed APK and AAB. The source ZIP and SHA256 checksums are attached.
+          NOTES
+          fi
+
+          if gh release view v1.0.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.0.10 \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
+              --notes-file release-notes.md
+            gh release upload v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          elif [[ "$PRERELEASE" == "true" ]]; then
+            gh release create v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
+              --prerelease \
+              --latest=false \
+              --notes-file release-notes.md
+          else
+            gh release create v1.0.10 release-assets/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "NewPipe v1.0.10" \
+              --notes-file release-notes.md
+          fi
+
+      - name: Upload release assets as workflow artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: NewPipe-v1.0.10-release-assets
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 30

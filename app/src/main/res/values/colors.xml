@@ -4,55 +4,55 @@
     <color name="contrastColor">@color/black</color>
     <color name="defaultIconTint">@color/black</color>
 
-    <color name="ic_launcher_background">#CD201F</color>
+    <color name="ic_launcher_background">#246BFD</color>
 
     <color name="placeholder_background">#999999</color>
     <color name="placeholder_foreground">#6C6C6C</color>
 
     <!-- Light Theme -->
-    <color name="light_background_color">#EEEEEE</color>
-    <color name="light_dialog_background_color">#EEEEEE</color>
-    <color name="light_settings_accent_color">#e53935</color>
-    <color name="light_separator_color">#32000000</color>
-    <color name="light_ripple_color">#48868686</color>
-    <color name="light_selected_color">#2a868686</color>
-    <color name="light_contrast_background_color">#1fa6a6a6</color>
-    <color name="light_shadow_start_color">#5a000000</color>
-    <color name="light_license_background_color">#ffffff</color>
-    <color name="light_license_text_color">#212121</color>
-    <color name="light_card_item_background_color">#F8F8F8</color>
-    <color name="light_card_item_contrast_color">#E9E9E9</color>
-    <color name="light_border_color">#33000000</color>
+    <color name="light_background_color">@color/np_light_background</color>
+    <color name="light_dialog_background_color">@color/np_light_surface_1</color>
+    <color name="light_settings_accent_color">@color/np_light_accent</color>
+    <color name="light_separator_color">@color/np_light_outline</color>
+    <color name="light_ripple_color">@color/np_light_ripple</color>
+    <color name="light_selected_color">@color/np_light_selected</color>
+    <color name="light_contrast_background_color">@color/np_light_surface_2</color>
+    <color name="light_shadow_start_color">@color/np_light_shadow</color>
+    <color name="light_license_background_color">@color/np_light_surface_1</color>
+    <color name="light_license_text_color">@color/np_light_on_surface</color>
+    <color name="light_card_item_background_color">@color/np_light_surface_1</color>
+    <color name="light_card_item_contrast_color">@color/np_light_surface_2</color>
+    <color name="light_border_color">@color/np_light_outline</color>
 
     <!-- Dark Theme -->
-    <color name="dark_background_color">#222222</color>
-    <color name="dark_dialog_background_color">#424242</color>
-    <color name="dark_settings_accent_color">#ff5252</color>
-    <color name="dark_separator_color">#0affffff</color>
-    <color name="dark_ripple_color">#48ffffff</color>
-    <color name="dark_selected_color">#2affffff</color>
-    <color name="dark_contrast_background_color">#1f717171</color>
-    <color name="dark_shadow_start_color">#82000000</color>
-    <color name="dark_license_background_color">#424242</color>
-    <color name="dark_license_text_color">#ffffff</color>
+    <color name="dark_background_color">@color/np_dark_background</color>
+    <color name="dark_dialog_background_color">@color/np_dark_surface_3</color>
+    <color name="dark_settings_accent_color">@color/np_dark_accent</color>
+    <color name="dark_separator_color">@color/np_dark_outline</color>
+    <color name="dark_ripple_color">@color/np_dark_ripple</color>
+    <color name="dark_selected_color">@color/np_dark_selected</color>
+    <color name="dark_contrast_background_color">@color/np_dark_surface_2</color>
+    <color name="dark_shadow_start_color">@color/np_dark_shadow</color>
+    <color name="dark_license_background_color">@color/np_dark_surface_3</color>
+    <color name="dark_license_text_color">@color/np_dark_on_surface</color>
     <color name="dark_queue_background_color">#af000000</color>
-    <color name="dark_card_item_background_color">#313131</color>
-    <color name="dark_card_item_contrast_color">#474747</color>
-    <color name="dark_border_color">#33FFFFFF</color>
+    <color name="dark_card_item_background_color">@color/np_dark_surface_1</color>
+    <color name="dark_card_item_contrast_color">@color/np_dark_surface_2</color>
+    <color name="dark_border_color">@color/np_dark_outline</color>
 
     <!-- Black Theme -->
-    <color name="black_background_color">#000000</color>
-    <color name="black_settings_accent_color">@color/dark_settings_accent_color</color>
-    <color name="black_separator_color">#1effffff</color>
-    <color name="black_contrast_background_color">#23454545</color>
-    <color name="black_card_item_background_color">#0F0F0F</color>
-    <color name="black_card_item_contrast_color">#202020</color>
-    <color name="black_border_color">#25FFFFFF</color>
+    <color name="black_background_color">@color/np_amoled_background</color>
+    <color name="black_settings_accent_color">@color/np_amoled_accent</color>
+    <color name="black_separator_color">@color/np_amoled_outline</color>
+    <color name="black_contrast_background_color">@color/np_amoled_surface_2</color>
+    <color name="black_card_item_background_color">@color/np_amoled_surface_1</color>
+    <color name="black_card_item_contrast_color">@color/np_amoled_surface_2</color>
+    <color name="black_border_color">@color/np_amoled_outline</color>
 
     <!-- Miscellaneous -->
     <color name="queue_background_color">@color/dark_queue_background_color</color>
     <color name="drawer_header_font_color">#F2FFFFFF</color>
-    <color name="duration_background_color">#aa000000</color>
+    <color name="duration_background_color">@color/np_duration_scrim</color>
     <color name="live_duration_background_color">#c8E53935</color>
     <color name="playlist_stream_count_background_color">#e6000000</color>
     <color name="duration_text_color">#EEFFFFFF</color>
