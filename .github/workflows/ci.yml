@@ -373,10 +373,14 @@ jobs:
           This is an unofficial fork of TeamNewPipe/NewPipe. Back up your data before switching from a differently signed NewPipe installation."
             echo "published=true" >> "$GITHUB_OUTPUT"
             echo "release_tag=$tag" >> "$GITHUB_OUTPUT"
+            echo "release_channel=$release_channel" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Bump version for the next development cycle
         if: steps.publish-head.outputs.current == 'true' && steps.release.outputs.published == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          RELEASE_CHANNEL: ${{ steps.release.outputs.release_channel }}
         shell: bash
         run: |
           set -euo pipefail
@@ -434,7 +438,7 @@ jobs:
           {
             echo "## Automatic release published"
             echo
-            echo "- Published release: [${tag}](https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag})"
-            echo "- Release channel: ${release_channel}"
+            echo "- Published release: [${RELEASE_TAG}](https://github.com/${GITHUB_REPOSITORY}/releases/tag/${RELEASE_TAG})"
+            echo "- Release channel: ${RELEASE_CHANNEL}"
             echo "- Next development version: ${next_version}"
           } >> "$GITHUB_STEP_SUMMARY"
