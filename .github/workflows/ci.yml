@@ -251,7 +251,7 @@ jobs:
           done
 
           if [[ "$present" != "4" ]]; then
-            echo "All four Android signing secrets are required for an automatic stable release." >&2
+            echo "All four Android signing secrets are required for every automatic signed release." >&2
             echo "Required: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD." >&2
             exit 1
           fi
@@ -316,7 +316,7 @@ jobs:
             echo "A newer commit arrived during the release build; skipping this publication." >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Publish stable GitHub release
+      - name: Publish GitHub release (stable or prerelease)
         if: steps.publish-head.outputs.current == 'true'
         id: release
         env:
@@ -333,7 +333,7 @@ jobs:
             release_flags=(--latest)
           else
             # Feature builds get unique prerelease tags and never replace a stable tag.
-            safe_branch="${GITHUB_REF_NAME//\\//-}"
+            safe_branch="${GITHUB_REF_NAME//\//-}"
             tag="v${VERSION_NAME}-${safe_branch}.${GITHUB_RUN_NUMBER}"
             release_title="NewPipe ${VERSION_NAME} (${GITHUB_REF_NAME} build #${GITHUB_RUN_NUMBER})"
             release_channel="feature prerelease"
