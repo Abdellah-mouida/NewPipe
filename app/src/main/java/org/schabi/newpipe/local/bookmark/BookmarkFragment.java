@@ -33,7 +33,6 @@ import org.schabi.newpipe.database.playlist.PlaylistLocalItem;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
 import org.schabi.newpipe.database.playlist.PlaylistStreamEntry;
 import org.schabi.newpipe.database.playlist.model.PlaylistRemoteEntity;
-import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.Page;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.databinding.DialogEditTextBinding;
@@ -385,7 +384,8 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
         final List<Single<List<StreamInfoItem>>> playlistLoads = new ArrayList<>();
         for (final LocalItem item : itemListAdapter.getItemsList()) {
             if (item instanceof PlaylistMetadataEntry) {
-                playlistLoads.add(localPlaylistManager.getPlaylistStreams(item.getUid())
+                final PlaylistMetadataEntry localPlaylist = (PlaylistMetadataEntry) item;
+                playlistLoads.add(localPlaylistManager.getPlaylistStreams(localPlaylist.getUid())
                         .firstElement()
                         .map(entries -> entries.stream()
                                 .map(PlaylistStreamEntry::toStreamInfoItem)
@@ -422,7 +422,7 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
                         serviceId,
                         url,
                         info.getNextPage(),
-                        extractStreamItems(info.getRelatedItems())));
+                        new ArrayList<>(info.getRelatedItems())));
     }
 
     private Single<List<StreamInfoItem>> loadMoreRemotePlaylistStreams(
@@ -440,14 +440,6 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
                     return loadMoreRemotePlaylistStreams(
                             serviceId, url, page.getNextPage(), streams);
                 });
-    }
-
-    @NonNull
-    private List<StreamInfoItem> extractStreamItems(@NonNull final List<InfoItem> items) {
-        return items.stream()
-                .filter(StreamInfoItem.class::isInstance)
-                .map(StreamInfoItem.class::cast)
-                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     ///////////////////////////////////////////////////////////////////////////
