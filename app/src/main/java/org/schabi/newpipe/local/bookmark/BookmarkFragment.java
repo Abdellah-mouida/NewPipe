@@ -390,8 +390,7 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
                         .map(entries -> entries.stream()
                                 .map(PlaylistStreamEntry::toStreamInfoItem)
                                 .collect(Collectors.toList()))
-                        .defaultIfEmpty(new ArrayList<>())
-                        .toSingle());
+                        .defaultIfEmpty(new ArrayList<>()));
             } else if (item instanceof PlaylistRemoteEntity) {
                 final PlaylistRemoteEntity remotePlaylist = (PlaylistRemoteEntity) item;
                 final String playlistUrl = remotePlaylist.getUrl();
