@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - dev
-      - master
       - premium
-      - 'redesign/**'
     # The release job bumps only this file after publishing. Do not start a
     # second CI/release cycle for that bot-generated version-only commit.
     paths-ignore:
@@ -15,10 +13,7 @@ on:
   pull_request:
     branches:
       - dev
-      - master
-      - refactor
       - premium
-      - 'release**'
 
   workflow_dispatch:
 
@@ -287,6 +282,8 @@ jobs:
           test -n "$apk"
           test -n "$aab"
           "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --verbose "$apk"
+          jarsigner -verify -verbose -certs "$aab" > "$RUNNER_TEMP/aab-signature-check.txt" 2>&1
+          grep -q "jar verified" "$RUNNER_TEMP/aab-signature-check.txt"
           mv "$apk" "NewPipe-v${version_name}.apk"
           mv "$aab" "NewPipe-v${version_name}.aab"
           echo "VERSION_NAME=$version_name" >> "$GITHUB_ENV"

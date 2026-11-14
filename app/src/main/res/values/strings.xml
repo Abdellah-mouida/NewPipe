@@ -203,6 +203,8 @@
     <string name="undo">Undo</string>
     <string name="file_deleted">File deleted</string>
     <string name="play_all">Play All</string>
+    <string name="shuffle_all_bookmarked_playlists">Shuffle all bookmarked playlists</string>
+    <string name="no_bookmarked_streams_to_shuffle">No streams found in bookmarked playlists</string>
     <string name="always">Always</string>
     <string name="just_once">Just Once</string>
     <string name="file">File</string>

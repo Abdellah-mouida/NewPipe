@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.widget.Toast;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,7 +31,11 @@ import org.schabi.newpipe.database.AppDatabase;
 import org.schabi.newpipe.database.LocalItem;
 import org.schabi.newpipe.database.playlist.PlaylistLocalItem;
 import org.schabi.newpipe.database.playlist.PlaylistMetadataEntry;
+import org.schabi.newpipe.database.playlist.PlaylistStreamEntry;
 import org.schabi.newpipe.database.playlist.model.PlaylistRemoteEntity;
+import org.schabi.newpipe.extractor.InfoItem;
+import org.schabi.newpipe.extractor.Page;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.databinding.DialogEditTextBinding;
 import org.schabi.newpipe.error.ErrorInfo;
 import org.schabi.newpipe.error.UserAction;
@@ -39,18 +44,24 @@ import org.schabi.newpipe.local.holder.LocalBookmarkPlaylistItemHolder;
 import org.schabi.newpipe.local.holder.RemoteBookmarkPlaylistItemHolder;
 import org.schabi.newpipe.local.playlist.LocalPlaylistManager;
 import org.schabi.newpipe.local.playlist.RemotePlaylistManager;
+import org.schabi.newpipe.player.playqueue.SinglePlayQueue;
+import org.schabi.newpipe.util.ExtractorHelper;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.OnClickGesture;
 import org.schabi.newpipe.util.debounce.DebounceSavable;
 import org.schabi.newpipe.util.debounce.DebounceSaver;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistLocalItem>, Void>
         implements DebounceSavable {
@@ -73,6 +84,11 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
     private DebounceSaver debounceSaver;
 
     private List<Pair<Long, LocalItem.LocalItemType>> deletedItems;
+    @Nullable
+    private View shuffleBookmarksButton;
+    @Nullable
+    private View shuffleBookmarksProgress;
+    private boolean isShufflingBookmarks;
 
     ///////////////////////////////////////////////////////////////////////////
     // Fragment LifeCycle - Creation
@@ -124,11 +140,18 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
         super.initViews(rootView, savedInstanceState);
 
         itemListAdapter.setUseItemHandle(true);
+        shuffleBookmarksButton = rootView.findViewById(R.id.bookmarks_shuffle_all);
+        shuffleBookmarksProgress = rootView.findViewById(R.id.bookmarks_shuffle_progress);
+        shuffleBookmarksButton.setVisibility(View.GONE);
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
+
+        if (shuffleBookmarksButton != null) {
+            shuffleBookmarksButton.setOnClickListener(view -> shuffleAllBookmarkedPlaylists());
+        }
 
         itemTouchHelper = new ItemTouchHelper(getItemTouchCallback());
         itemTouchHelper.attachToRecyclerView(itemsList);
@@ -218,6 +241,9 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
 
         databaseSubscription = null;
         itemTouchHelper = null;
+        shuffleBookmarksButton = null;
+        shuffleBookmarksProgress = null;
+        isShufflingBookmarks = false;
     }
 
     @Override
@@ -287,6 +313,9 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
 
         itemListAdapter.clearStreamItemList();
 
+        if (shuffleBookmarksButton != null) {
+            shuffleBookmarksButton.setVisibility(result.isEmpty() ? View.GONE : View.VISIBLE);
+        }
         if (result.isEmpty()) {
             showEmptyState();
             return;
@@ -298,6 +327,127 @@ public final class BookmarkFragment extends BaseLocalListFragment<List<PlaylistL
             itemsListState = null;
         }
         hideLoading();
+    }
+
+    /**
+     * Load all streams from the bookmarked local and remote playlists, then start one shuffled
+     * queue. Remote playlists are paged through completely so later pages are included too.
+     */
+    private void shuffleAllBookmarkedPlaylists() {
+        if (activity == null || itemListAdapter == null || localPlaylistManager == null
+                || isLoadingComplete == null || !isLoadingComplete.get()
+                || isShufflingBookmarks) {
+            return;
+        }
+
+        setShuffleLoading(true);
+        disposables.add(loadAllBookmarkedStreams()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(streams -> {
+                    setShuffleLoading(false);
+                    if (activity == null) {
+                        return;
+                    }
+                    if (streams.isEmpty()) {
+                        Toast.makeText(activity, R.string.no_bookmarked_streams_to_shuffle,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Randomize before creating the queue so the first stream is random too.
+                    Collections.shuffle(streams);
+                    final SinglePlayQueue queue = new SinglePlayQueue(streams, 0);
+                    // Use native queue shuffle so the player can restore the original order.
+                    queue.shuffle();
+                    NavigationHelper.playOnMainPlayer(activity, queue);
+                }, throwable -> {
+                    setShuffleLoading(false);
+                    if (activity != null) {
+                        showError(new ErrorInfo(throwable, UserAction.REQUESTED_BOOKMARK,
+                                "Shuffling bookmarked playlists"));
+                    }
+                }));
+    }
+
+    private void setShuffleLoading(final boolean loading) {
+        isShufflingBookmarks = loading;
+        if (shuffleBookmarksButton != null) {
+            shuffleBookmarksButton.setEnabled(!loading);
+            shuffleBookmarksButton.setAlpha(loading ? 0.65f : 1.0f);
+        }
+        if (shuffleBookmarksProgress != null) {
+            shuffleBookmarksProgress.setVisibility(loading ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private Single<List<StreamInfoItem>> loadAllBookmarkedStreams() {
+        final List<Single<List<StreamInfoItem>>> playlistLoads = new ArrayList<>();
+        for (final LocalItem item : itemListAdapter.getItemsList()) {
+            if (item instanceof PlaylistMetadataEntry) {
+                playlistLoads.add(localPlaylistManager.getPlaylistStreams(item.getUid())
+                        .firstElement()
+                        .map(entries -> entries.stream()
+                                .map(PlaylistStreamEntry::toStreamInfoItem)
+                                .collect(Collectors.toList()))
+                        .defaultIfEmpty(new ArrayList<>())
+                        .toSingle());
+            } else if (item instanceof PlaylistRemoteEntity) {
+                final PlaylistRemoteEntity remotePlaylist = (PlaylistRemoteEntity) item;
+                final String playlistUrl = remotePlaylist.getUrl();
+                if (playlistUrl != null) {
+                    playlistLoads.add(loadRemotePlaylistStreams(
+                            remotePlaylist.getServiceId(), playlistUrl));
+                }
+            }
+        }
+
+        if (playlistLoads.isEmpty()) {
+            return Single.just(new ArrayList<>());
+        }
+
+        return Single.concat(playlistLoads)
+                .toList()
+                .map(playlistStreams -> {
+                    final List<StreamInfoItem> allStreams = new ArrayList<>();
+                    playlistStreams.forEach(allStreams::addAll);
+                    return allStreams;
+                });
+    }
+
+    private Single<List<StreamInfoItem>> loadRemotePlaylistStreams(
+            final int serviceId, @NonNull final String url) {
+        return ExtractorHelper.getPlaylistInfo(serviceId, url, false)
+                .flatMap(info -> loadMoreRemotePlaylistStreams(
+                        serviceId,
+                        url,
+                        info.getNextPage(),
+                        extractStreamItems(info.getRelatedItems())));
+    }
+
+    private Single<List<StreamInfoItem>> loadMoreRemotePlaylistStreams(
+            final int serviceId,
+            @NonNull final String url,
+            @Nullable final Page nextPage,
+            @NonNull final List<StreamInfoItem> streams) {
+        if (!Page.isValid(nextPage)) {
+            return Single.just(streams);
+        }
+
+        return ExtractorHelper.getMorePlaylistItems(serviceId, url, nextPage)
+                .flatMap(page -> {
+                    streams.addAll(page.getItems());
+                    return loadMoreRemotePlaylistStreams(
+                            serviceId, url, page.getNextPage(), streams);
+                });
+    }
+
+    @NonNull
+    private List<StreamInfoItem> extractStreamItems(@NonNull final List<InfoItem> items) {
+        return items.stream()
+                .filter(StreamInfoItem.class::isInstance)
+                .map(StreamInfoItem.class::cast)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     ///////////////////////////////////////////////////////////////////////////
