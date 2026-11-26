@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Encodes extractor metadata in standard media-container tags. */
+/** Encodes extractor metadata in standard audio and video container tags. */
 public final class MediaMetadata {
     private static final int MAX_ARTWORK_BYTES = 5 * 1024 * 1024;
 
