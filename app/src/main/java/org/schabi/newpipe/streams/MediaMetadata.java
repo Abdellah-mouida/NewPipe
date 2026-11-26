@@ -42,7 +42,7 @@ public final class MediaMetadata {
         add(tags, "LICENSE", info.getLicence());
         add(tags, "DATE", info.getTextualUploadDate());
         if (info.getDescription() != null) {
-            add(tags, "DESCRIPTION", info.getDescription().getContent());
+            add(tags, "DESCRIPTION", info.getDescription().content());
         }
         if (info.getDuration() > 0) {
             add(tags, "LENGTH", Long.toString(info.getDuration()));
@@ -75,7 +75,7 @@ public final class MediaMetadata {
         textItem(items, "\u00A9day", info.getTextualUploadDate());
         textItem(items, "\u00A9cmt", info.getUrl());
         if (info.getDescription() != null) {
-            textItem(items, "\u00A9des", info.getDescription().getContent());
+            textItem(items, "\u00A9des", info.getDescription().content());
         }
         for (final String tag : info.getTags()) {
             textItem(items, "\u00A9key", tag);
@@ -107,8 +107,8 @@ public final class MediaMetadata {
         id3Text(frames, "WOAS", info.getUrl());
         id3Text(frames, "WCOP", info.getLicence());
         if (info.getDescription() != null) {
-            id3Text(frames, "TIT3", info.getDescription().getContent());
-            id3Comment(frames, info.getDescription().getContent());
+            id3Text(frames, "TIT3", info.getDescription().content());
+            id3Comment(frames, info.getDescription().content());
         }
         id3UserIf(frames, "ARTIST_URL", info.getUploaderUrl());
         id3UserIf(frames, "PUBLISHER", info.getHost());
