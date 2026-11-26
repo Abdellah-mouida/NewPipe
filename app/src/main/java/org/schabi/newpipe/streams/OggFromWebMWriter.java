@@ -288,38 +288,32 @@ public class OggFromWebMWriter implements Closeable {
             Log.d("OggFromWebMWriter", "Downloading media with codec ID " + webmTrack.codecId);
         }
 
+        final var metadata = MediaMetadata.createVorbisComments(streamInfo);
         if ("A_OPUS".equals(webmTrack.codecId)) {
-            final var metadata = new ArrayList<Pair<String, String>>();
-            if (streamInfo != null) {
-                metadata.add(Pair.create("COMMENT", streamInfo.getUrl()));
-                metadata.add(Pair.create("GENRE", streamInfo.getCategory()));
-                metadata.add(Pair.create("ARTIST", streamInfo.getUploaderName()));
-                metadata.add(Pair.create("TITLE", streamInfo.getName()));
-                metadata.add(Pair.create("DATE", streamInfo
-                        .getUploadDate()
-                        .getLocalDateTime()
-                        .format(DateTimeFormatter.ISO_DATE)));
-            }
-
-            if (DEBUG) {
-                Log.d("OggFromWebMWriter", "Creating metadata header with this data:");
-                metadata.forEach(p -> {
-                    Log.d("OggFromWebMWriter", p.first + "=" + p.second);
-                });
-            }
-
             return makeOpusTagsHeader(metadata);
         } else if ("A_VORBIS".equals(webmTrack.codecId)) {
-            return new byte[]{
-                    0x03, // ¿¿¿???
-                    0x76, 0x6f, 0x72, 0x62, 0x69, 0x73, // "vorbis" binary string
-                    0x00, 0x00, 0x00, 0x00, // writing application string size (not present)
-                    0x00, 0x00, 0x00, 0x00 // additional tags count (zero means no tags)
-            };
+            return makeVorbisCommentsHeader(metadata);
         }
-
-        // not implemented for the desired codec
         return null;
+    }
+
+    private static byte[] makeVorbisCommentsHeader(final List<Pair<String, String>> comments) {
+        final byte[] vendor = "NewPipe".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        final List<byte[]> tags = comments.stream()
+                .filter(pair -> pair.second != null && !pair.second.isEmpty())
+                .map(OggFromWebMWriter::makeOpusMetadataTag)
+                .collect(Collectors.toList());
+        final int size = 7 + 4 + vendor.length + 4
+                + tags.stream().mapToInt(tag -> tag.length).sum() + 1;
+        final ByteBuffer buffer = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
+        buffer.put((byte) 0x03);
+        buffer.put(new byte[]{0x76, 0x6f, 0x72, 0x62, 0x69, 0x73});
+        buffer.putInt(vendor.length);
+        buffer.put(vendor);
+        buffer.putInt(tags.size());
+        tags.forEach(buffer::put);
+        buffer.put((byte) 0x01);
+        return buffer.array();
     }
 
     /**
@@ -333,7 +327,7 @@ public class OggFromWebMWriter implements Closeable {
     private static byte[] makeOpusMetadataTag(final Pair<String, String> pair) {
         final var keyValue = pair.first.toUpperCase() + "=" + pair.second.trim();
 
-        final var bytes = keyValue.getBytes();
+        final var bytes = keyValue.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         final var buf = ByteBuffer.allocate(4 + bytes.length);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         buf.putInt(bytes.length);
