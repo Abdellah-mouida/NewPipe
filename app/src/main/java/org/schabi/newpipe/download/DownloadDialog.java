@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -19,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -354,6 +357,25 @@ public class DownloadDialog extends DialogFragment
             }
             return false;
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() == null) return;
+        final Window window = getDialog().getWindow();
+        if (window == null) return;
+        window.setBackgroundDrawableResource(android.R.color.transparent);
+        final WindowManager.LayoutParams attributes = window.getAttributes();
+        attributes.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+        attributes.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        attributes.dimAmount = 0.58f;
+        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+            window.setBackgroundBlurRadius(28);
+        }
+        window.setAttributes(attributes);
     }
 
     @Override
@@ -1053,6 +1075,8 @@ public class DownloadDialog extends DialogFragment
                 psName = Postprocessing.ALGORITHM_M4A_NO_DASH;
             } else if (selectedStream.getFormat() == MediaFormat.WEBMA_OPUS) {
                 psName = Postprocessing.ALGORITHM_OGG_FROM_WEBM_DEMUXER;
+            } else if (selectedStream.getFormat() == MediaFormat.MP3) {
+                psName = Postprocessing.ALGORITHM_MP3_METADATA;
             }
         } else if (checkedRadioButtonId == R.id.video_button) {
             kind = 'v';
