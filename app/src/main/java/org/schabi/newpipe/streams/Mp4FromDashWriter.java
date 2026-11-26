@@ -1,5 +1,6 @@
 package org.schabi.newpipe.streams;
 
+import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.streams.Mp4DashReader.Hdlr;
 import org.schabi.newpipe.streams.Mp4DashReader.Mdia;
 import org.schabi.newpipe.streams.Mp4DashReader.Mp4DashChunk;
@@ -28,6 +29,9 @@ public class Mp4FromDashWriter {
     private static final int THRESHOLD_MOOV_LENGTH = (256 * 1024) + (2048 * 1024);
 
     private final long time;
+    private final StreamInfo streamInfo;
+    private byte[] metadataUdta;
+    private boolean metadataPrepared;
 
     private ByteBuffer auxBuffer;
     private SharpStream outStream;
@@ -51,6 +55,12 @@ public class Mp4FromDashWriter {
     private final ArrayList<Integer> compatibleBrands = new ArrayList<>(5);
 
     public Mp4FromDashWriter(final SharpStream... sources) throws IOException {
+        this(null, sources);
+    }
+
+    public Mp4FromDashWriter(final StreamInfo streamInfo, final SharpStream... sources)
+            throws IOException {
+        this.streamInfo = streamInfo;
         for (final SharpStream src : sources) {
             if (!src.canRewind() && !src.canRead()) {
                 throw new IOException("All sources must be readable and allow rewind");
@@ -403,6 +413,14 @@ public class Mp4FromDashWriter {
         }
     }
 
+    private byte[] getMetadataUdta() {
+        if (!metadataPrepared) {
+            metadataUdta = MediaMetadata.createMp4Udta(streamInfo);
+            metadataPrepared = true;
+        }
+        return metadataUdta;
+    }
+
     private Mp4DashSample getNextSample(final int track) throws IOException {
         if (readersChunks[track] == null) {
             readersChunks[track] = readers[track].getNextChunk(false);
@@ -720,6 +738,10 @@ public class Mp4FromDashWriter {
             makeTrak(i, durations[i], defaultMediaTime[i], tablesInfo[i], is64);
         }
 
+        final byte[] metadata = getMetadataUdta();
+        if (metadata != null) {
+            auxWrite(metadata);
+        }
         return lengthFor(start);
     }
 
