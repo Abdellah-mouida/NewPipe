@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -421,11 +420,7 @@ public class DownloadDialog extends DialogFragment
         if (blurView == null || target == null) {
             return;
         }
-        final Drawable windowBackground = activity.getWindow().getDecorView().getBackground();
         blurView.setupWith(target).setBlurRadius(22f);
-        if (windowBackground != null) {
-            blurView.setFrameClearDrawable(windowBackground);
-        }
         final TypedValue glassValue = new TypedValue();
         int glassColor = 0xE61B1F2A;
         if (requireContext().getTheme().resolveAttribute(R.attr.npColorGlass, glassValue, true)) {
