@@ -921,4 +921,12 @@
     <string name="api23_requirement_dialog_message">Unfortunately NewPipe depends on a few libraries that dropped support for Android 5.0 and 5.1. The next NewPipe release will therefore only work on devices with Android 6 or higher, sadly. Read more in the blogpost.</string>
     <string name="api23_requirement_dialog_blogpost">Blogpost</string>
     <string name="made_by_abdellah_mouida">Made by Abdellah Mouida</string>
+
+    <string name="download_status_failed">Failed</string>
+    <string name="download_status_recovering">Recovering</string>
+    <string name="download_status_processing">Processing</string>
+    <string name="download_status_downloading">Downloading</string>
+    <string name="download_status_queued">Queued</string>
+    <string name="download_status_paused">Paused</string>
+    <string name="download_status_completed">Completed</string>
 </resources>
