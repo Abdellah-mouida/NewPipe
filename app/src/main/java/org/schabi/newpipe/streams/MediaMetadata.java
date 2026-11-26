@@ -307,7 +307,7 @@ public final class MediaMetadata {
             }
             final ByteArrayOutputStream output =
                     new ByteArrayOutputStream(length > 0 ? length : 8192);
-            try (final InputStream input = connection.getInputStream()) {
+            try (InputStream input = connection.getInputStream()) {
                 final byte[] buffer = new byte[16384];
                 int count;
                 while ((count = input.read(buffer)) != -1) {
