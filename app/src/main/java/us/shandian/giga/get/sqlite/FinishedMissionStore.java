@@ -27,7 +27,7 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
     // TODO: use NewPipeSQLiteHelper ('s constants) when playlist branch is merged (?)
     private static final String DATABASE_NAME = "downloads.db";
 
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     /**
      * The table name of download missions (old)
@@ -43,6 +43,7 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
      * The key to the urls of a mission
      */
     private static final String KEY_SOURCE = "url";
+    private static final String KEY_THUMBNAIL = "thumbnail_url";
 
 
     /**
@@ -63,6 +64,7 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
             "CREATE TABLE " + FINISHED_TABLE_NAME + " (" +
                     KEY_PATH + " TEXT NOT NULL, " +
                     KEY_SOURCE + " TEXT NOT NULL, " +
+                    KEY_THUMBNAIL + " TEXT, " +
                     KEY_DONE + " INTEGER NOT NULL, " +
                     KEY_TIMESTAMP + " INTEGER NOT NULL, " +
                     KEY_KIND + " TEXT NOT NULL, " +
@@ -130,6 +132,12 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
 
             cursor.close();
             db.execSQL("DROP TABLE " + MISSIONS_TABLE_NAME_v2);
+            oldVersion = 4;
+        }
+
+        if (oldVersion == 4) {
+            db.execSQL("ALTER TABLE " + FINISHED_TABLE_NAME + " ADD COLUMN "
+                    + KEY_THUMBNAIL + " TEXT;");
         }
     }
 
@@ -142,6 +150,7 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
     private ContentValues getValuesOfMission(@NonNull Mission downloadMission) {
         ContentValues values = new ContentValues();
         values.put(KEY_SOURCE, downloadMission.source);
+        values.put(KEY_THUMBNAIL, downloadMission.thumbnailUrl);
         values.put(KEY_PATH, downloadMission.storage.getUri().toString());
         values.put(KEY_DONE, downloadMission.length);
         values.put(KEY_TIMESTAMP, downloadMission.timestamp);
@@ -159,6 +168,7 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
         FinishedMission mission = new FinishedMission();
 
         mission.source = cursor.getString(cursor.getColumnIndexOrThrow(KEY_SOURCE));
+        mission.thumbnailUrl = cursor.getString(cursor.getColumnIndexOrThrow(KEY_THUMBNAIL));
         mission.length = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DONE));
         mission.timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_TIMESTAMP));
         mission.kind = kind.charAt(0);

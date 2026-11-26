@@ -3,6 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/download_dialog_blur"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/download_dialog_glass" />
+
     <include
         android:id="@+id/toolbar_layout"
         layout="@layout/toolbar_layout" />

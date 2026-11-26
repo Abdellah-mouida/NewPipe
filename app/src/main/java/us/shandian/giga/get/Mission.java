@@ -16,6 +16,11 @@ public abstract class Mission implements Serializable {
     public String source;
 
     /**
+     * Best available source thumbnail URL, retained for the download list.
+     */
+    public String thumbnailUrl;
+
+    /**
      * Length of the current resource
      */
     public long length;

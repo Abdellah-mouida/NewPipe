@@ -40,6 +40,7 @@ import androidx.preference.PreferenceManager;
 
 import org.schabi.newpipe.R;
 import org.schabi.newpipe.download.DownloadActivity;
+import org.schabi.newpipe.extractor.Image;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
 import org.schabi.newpipe.player.helper.LockManager;
 import org.schabi.newpipe.streams.io.StoredDirectoryHelper;
@@ -411,6 +412,7 @@ public class DownloadManagerService extends Service {
         final DownloadMission mission = new DownloadMission(urls, storage, kind, ps);
         mission.threadCount = threads;
         mission.source = streamInfo.getUrl();
+        mission.thumbnailUrl = getBestThumbnailUrl(streamInfo);
         mission.nearLength = nearLength;
         mission.recoveryInfo = recovery.toArray(new MissionRecoveryInfo[0]);
 
@@ -420,6 +422,27 @@ public class DownloadManagerService extends Service {
         handleConnectivityState(true);// first check the actual network status
 
         mManager.startMission(mission);
+    }
+
+    @Nullable
+    private static String getBestThumbnailUrl(@NonNull final StreamInfo streamInfo) {
+        if (streamInfo.getThumbnails() == null || streamInfo.getThumbnails().isEmpty()) {
+            return null;
+        }
+        String bestUrl = null;
+        long bestArea = -1;
+        for (final Image image : streamInfo.getThumbnails()) {
+            if (image == null || image.getUrl() == null || image.getUrl().isEmpty()) {
+                continue;
+            }
+            final long area = (long) Math.max(0, image.getWidth())
+                    * Math.max(0, image.getHeight());
+            if (bestUrl == null || area > bestArea) {
+                bestUrl = image.getUrl();
+                bestArea = area;
+            }
+        }
+        return bestUrl;
     }
 
     public void notifyFinishedDownload(String name) {

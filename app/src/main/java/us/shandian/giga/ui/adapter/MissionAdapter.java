@@ -25,6 +25,8 @@ import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -32,6 +34,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.LruCache;
 import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -39,6 +42,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -70,8 +74,13 @@ import org.schabi.newpipe.util.Localization;
 import org.schabi.newpipe.util.NavigationHelper;
 import org.schabi.newpipe.util.external_communication.ShareUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -103,6 +112,15 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
     private static final String DELETE = "deleteFinishedDownloads";
 
     private static final int HASH_NOTIFICATION_ID = 123790;
+    private static final int MAX_THUMBNAIL_BYTES = 4 * 1024 * 1024;
+
+    private final LruCache<String, Bitmap> thumbnailCache =
+            new LruCache<String, Bitmap>(6 * 1024) {
+                @Override
+                protected int sizeOf(@NonNull final String key, @NonNull final Bitmap value) {
+                    return Math.max(1, value.getByteCount() / 1024);
+                }
+            };
 
     private final Context mContext;
     private final LayoutInflater mInflater;
@@ -201,11 +219,12 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
         Utility.FileType type = Utility.getFileType(item.mission.kind, item.mission.storage.getName());
 
-        h.icon.setImageResource(Utility.getIconForFileType(type));
+        bindThumbnail(h, item.mission, type);
         h.name.setText(item.mission.storage.getName());
 
 
         if (h.item.mission instanceof DownloadMission) {
+            h.progressView.setVisibility(View.VISIBLE);
             DownloadMission mission = (DownloadMission) item.mission;
             String length = Utility.formatBytes(mission.getLength());
             if (mission.running && !mission.isPsRunning()) length += " --.- kB/s";
@@ -217,6 +236,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
 
             h.date.setText("");
         } else {
+            h.progressView.setVisibility(View.GONE);
             h.progress.setMarquee(false);
             h.status.setText("100%");
             h.progress.setProgress(1.0f);
@@ -237,6 +257,88 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
     @Override
     public int getItemViewType(int position) {
         return mIterator.getSpecialAtItem(position);
+    }
+
+    private void bindThumbnail(@NonNull final ViewHolderItem holder,
+                               @NonNull final Mission mission,
+                               @NonNull final Utility.FileType type) {
+        final String thumbnailUrl = mission.thumbnailUrl;
+        holder.icon.setTag(thumbnailUrl);
+        holder.icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        holder.icon.setImageResource(Utility.getIconForFileType(type));
+        holder.icon.setColorFilter(Color.WHITE);
+        if (thumbnailUrl == null || thumbnailUrl.isEmpty()) {
+            return;
+        }
+        final Bitmap cached = thumbnailCache.get(thumbnailUrl);
+        if (cached != null) {
+            holder.icon.clearColorFilter();
+            holder.icon.setImageBitmap(cached);
+            return;
+        }
+        compositeDisposable.add(Observable.fromCallable(() -> fetchThumbnail(thumbnailUrl))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bitmap -> {
+                    if (bitmap != null) {
+                        thumbnailCache.put(thumbnailUrl, bitmap);
+                        if (thumbnailUrl.equals(holder.icon.getTag())) {
+                            holder.icon.clearColorFilter();
+                            holder.icon.setImageBitmap(bitmap);
+                        }
+                    }
+                }, throwable -> Log.w(TAG, "Unable to load download thumbnail", throwable)));
+    }
+
+    private Bitmap fetchThumbnail(@NonNull final String thumbnailUrl) throws IOException {
+        final URL url = new URL(thumbnailUrl);
+        final String protocol = url.getProtocol();
+        if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+            return null;
+        }
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(7000);
+            connection.setRequestProperty("User-Agent", "NewPipe");
+            final int responseCode = connection.getResponseCode();
+            if (responseCode < 200 || responseCode >= 300
+                    || connection.getContentLength() > MAX_THUMBNAIL_BYTES) {
+                return null;
+            }
+            final ByteArrayOutputStream output = new ByteArrayOutputStream(32768);
+            try (InputStream input = connection.getInputStream()) {
+                final byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    if (output.size() + count > MAX_THUMBNAIL_BYTES) {
+                        return null;
+                    }
+                    output.write(buffer, 0, count);
+                }
+            }
+            final byte[] bytes = output.toByteArray();
+            final BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, bounds);
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
+                return null;
+            }
+            int sampleSize = 1;
+            while (bounds.outWidth / sampleSize > 640
+                    || bounds.outHeight / sampleSize > 360) {
+                sampleSize *= 2;
+            }
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = sampleSize;
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
     @SuppressLint("DefaultLocale")
@@ -903,6 +1005,8 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         TextView date;
         TextView state;
         ProgressDrawable progress;
+        View progressView;
+        View card;
 
         PopupMenu popupMenu;
         MenuItem retry;
@@ -926,7 +1030,11 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             super(view);
 
             progress = new ProgressDrawable();
-            itemView.findViewById(R.id.item_progress).setBackground(progress);
+            progressView = itemView.findViewById(R.id.item_progress);
+            progressView.setBackground(progress);
+            card = itemView.findViewById(R.id.item_bkg);
+            card.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+            card.setClipToOutline(true);
 
             status = itemView.findViewById(R.id.item_status);
             name = itemView.findViewById(R.id.item_name);

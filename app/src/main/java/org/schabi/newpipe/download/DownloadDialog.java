@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
@@ -16,10 +17,13 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
+import android.widget.FrameLayout;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -30,6 +34,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
+import androidx.core.graphics.ColorUtils;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +49,9 @@ import androidx.preference.PreferenceManager;
 import com.evernote.android.state.State;
 import com.livefront.bridge.Bridge;
 import com.nononsenseapps.filepicker.Utils;
+
+import eightbitlab.com.blurview.BlurTarget;
+import eightbitlab.com.blurview.BlurView;
 
 import org.schabi.newpipe.MainActivity;
 import org.schabi.newpipe.R;
@@ -359,6 +367,33 @@ public class DownloadDialog extends DialogFragment
         });
     }
 
+    private BlurTarget ensureBlurTarget() {
+        final Activity activity = getActivity();
+        if (activity == null) {
+            return null;
+        }
+        final ViewGroup contentRoot = activity.findViewById(android.R.id.content);
+        if (contentRoot == null) {
+            return null;
+        }
+        for (int i = 0; i < contentRoot.getChildCount(); i++) {
+            final View child = contentRoot.getChildAt(i);
+            if (child instanceof BlurTarget) {
+                return (BlurTarget) child;
+            }
+        }
+        final BlurTarget target = new BlurTarget(activity);
+        while (contentRoot.getChildCount() > 0) {
+            final View child = contentRoot.getChildAt(0);
+            final ViewGroup.LayoutParams childParams = child.getLayoutParams();
+            contentRoot.removeViewAt(0);
+            target.addView(child, childParams);
+        }
+        contentRoot.addView(target, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        return target;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -373,13 +408,35 @@ public class DownloadDialog extends DialogFragment
         final WindowManager.LayoutParams attributes = window.getAttributes();
         attributes.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
         attributes.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        attributes.dimAmount = 0.58f;
+        attributes.dimAmount = 0.38f;
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-            window.setBackgroundBlurRadius(28);
-        }
         window.setAttributes(attributes);
+
+        final View dialogView = getView();
+        final Activity activity = getActivity();
+        if (dialogView == null || activity == null) {
+            return;
+        }
+        final BlurView blurView = dialogView.findViewById(R.id.download_dialog_blur);
+        final BlurTarget target = ensureBlurTarget();
+        if (blurView == null || target == null) {
+            return;
+        }
+        final Drawable windowBackground = activity.getWindow().getDecorView().getBackground();
+        blurView.setupWith(target).setBlurRadius(22f);
+        if (windowBackground != null) {
+            blurView.setFrameClearDrawable(windowBackground);
+        }
+        final TypedValue glassValue = new TypedValue();
+        int glassColor = 0xE61B1F2A;
+        if (requireContext().getTheme().resolveAttribute(R.attr.npColorGlass, glassValue, true)) {
+            glassColor = glassValue.resourceId != 0
+                    ? androidx.core.content.ContextCompat.getColor(requireContext(),
+                    glassValue.resourceId) : glassValue.data;
+        }
+        blurView.setOverlayColor(ColorUtils.setAlphaComponent(glassColor, 176));
+        blurView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        blurView.setClipToOutline(true);
     }
 
     @Override

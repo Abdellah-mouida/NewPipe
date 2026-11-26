@@ -1,127 +1,115 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
     <RelativeLayout
         android:id="@+id/item_bkg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:background="@color/bluegray">
-
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:background="@drawable/download_mission_card"
+        android:paddingBottom="6dp">
         <RelativeLayout
             android:id="@+id/item_title_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginTop="2dp">
-
             <org.schabi.newpipe.views.NewPipeTextView
                 android:id="@+id/item_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
+                android:layout_marginStart="10dp"
                 android:singleLine="true"
                 android:text="0%"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
-
+                android:textSize="18sp"
+                android:textStyle="bold" />
             <ImageView
                 android:id="@+id/item_more"
                 style="?attr/buttonBarButtonStyle"
-                android:layout_width="49dp"
-                android:layout_height="49dp"
-                android:layout_alignParentRight="true"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="1dp"
-                android:contentDescription="TODO"
+                android:contentDescription="@string/more_options"
                 android:scaleType="center"
                 android:src="@drawable/ic_more_vert"
-                app:tint="?attr/actionColor" />
-
+                app:tint="@color/white" />
         </RelativeLayout>
-
         <ImageView
             android:id="@+id/item_icon"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="match_parent"
+            android:layout_height="142dp"
             android:layout_below="@id/item_title_line"
-            android:layout_centerHorizontal="true"
-            android:contentDescription="TODO"
-            android:gravity="center"
-            android:padding="10dp"
-            android:scaleType="fitXY"
-            app:tint="?attr/actionColor" />
-
+            android:contentDescription="@string/metadata_thumbnails"
+            android:scaleType="centerCrop" />
         <org.schabi.newpipe.views.NewPipeTextView
             android:id="@+id/item_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/item_icon"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:padding="6dp"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:paddingStart="10dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="10dp"
             android:text="XXX.xx"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
-
         <org.schabi.newpipe.views.NewPipeTextView
             android:id="@+id/item_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/item_name"
-            android:padding="6dp"
+            android:paddingStart="10dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="10dp"
             android:singleLine="true"
             android:text="100.00MB"
-            android:textColor="@color/white"
+            android:textColor="#DFFFFFFF"
             android:textSize="12sp" />
-
         <org.schabi.newpipe.views.NewPipeTextView
             android:id="@+id/item_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/item_name"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:padding="6dp"
             android:singleLine="true"
             android:text=""
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-
-
+            android:textColor="#DFFFFFFF"
+            android:textSize="11sp" />
         <TextView
             android:id="@+id/item_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/item_size"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="6dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
             android:background="@drawable/download_mission_card"
-            android:paddingStart="8dp"
+            android:paddingStart="9dp"
             android:paddingTop="3dp"
-            android:paddingEnd="8dp"
+            android:paddingEnd="9dp"
             android:paddingBottom="3dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="11sp" />
-
-        <View
-            android:id="@+id/item_progress"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_below="@id/item_state"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="6dp"
-            android:background="@drawable/download_progress_track" />
     </RelativeLayout>
-
-</RelativeLayout>
+    <View
+        android:id="@+id/item_progress"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="9dp"
+        android:background="@drawable/download_progress_track" />
+</LinearLayout>
