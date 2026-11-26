@@ -56,11 +56,10 @@ public class ProgressDrawable extends Drawable {
         int width = getBounds().width();
         int height = getBounds().height();
 
-        Paint paint = new Paint();
-
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        final float radius = height / 2.0f;
         paint.setColor(mBackgroundColor);
-        canvas.drawRect(0, 0, width, height, paint);
-
+        canvas.drawRoundRect(0, 0, width, height, radius, radius, paint);
         paint.setColor(mForegroundColor);
 
         if (mMarqueeLine != null) {
@@ -88,7 +87,13 @@ public class ProgressDrawable extends Drawable {
             }
             marquee.close();
 
+            final Path clip = new Path();
+            clip.addRoundRect(0, 0, getBounds().width(), height,
+                    radius, radius, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(clip);
             canvas.drawPath(marquee, paint2);// draw marquee
+            canvas.restore();
 
             if (System.currentTimeMillis() >= mMarqueeNext) {
                 // program next update
@@ -98,7 +103,10 @@ public class ProgressDrawable extends Drawable {
             return;
         }
 
-        canvas.drawRect(0, 0, (int) (mProgress * width), height, paint);
+        final float progressWidth = Math.max(0, Math.min(width, mProgress * width));
+        if (progressWidth > 0) {
+            canvas.drawRoundRect(0, 0, progressWidth, height, radius, radius, paint);
+        }
     }
 
     @Override
