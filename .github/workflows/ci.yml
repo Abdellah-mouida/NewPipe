@@ -62,13 +62,39 @@ jobs:
           ./gradlew --version
 
       - name: Build, lint and run unit tests
+        shell: bash
         run: |
-          ./gradlew --no-daemon \
-            assembleContinuous \
-            lintContinuous \
-            testDebugUnitTest \
-            --stacktrace \
-            -DskipFormatKtlint
+          set -uo pipefail
+          log_file="$RUNNER_TEMP/gradle-build.log"
+          for attempt in 1 2 3 4; do
+            echo "Gradle build attempt $attempt/4"
+            if ./gradlew --no-daemon \
+              assembleContinuous \
+              lintContinuous \
+              testDebugUnitTest \
+              --stacktrace \
+              -DskipFormatKtlint >"$log_file" 2>&1; then
+              cat "$log_file"
+              exit 0
+            else
+              result=$?
+              cat "$log_file"
+            fi
+
+            # Retry only dependency-server throttling; never hide source or test failures.
+            if ! grep -Eiq 'status code 429|HTTP 429|Too Many Requests' "$log_file"; then
+              exit "$result"
+            fi
+
+            if [[ "$attempt" -eq 4 ]]; then
+              echo "Maven repository kept returning HTTP 429 after four attempts." >&2
+              exit "$result"
+            fi
+
+            delay=$((30 * (2 ** (attempt - 1))))
+            echo "Maven Central rate-limited dependency resolution; retrying in ${delay}s."
+            sleep "$delay"
+          done
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
