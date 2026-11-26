@@ -132,7 +132,8 @@ public class FinishedMissionStore extends SQLiteOpenHelper {
 
             cursor.close();
             db.execSQL("DROP TABLE " + MISSIONS_TABLE_NAME_v2);
-            oldVersion = 4;
+            // The recreated table already includes thumbnail_url.
+            oldVersion = 5;
         }
 
         if (oldVersion == 4) {
