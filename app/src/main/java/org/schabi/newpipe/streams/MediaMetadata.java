@@ -243,7 +243,8 @@ public final class MediaMetadata {
         if (name.length != 4) {
             throw new IllegalArgumentException("MP4 atom must be four bytes");
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(8 + payload.length).order(ByteOrder.BIG_ENDIAN);
+        final ByteBuffer buffer = ByteBuffer.allocate(8 + payload.length)
+                .order(ByteOrder.BIG_ENDIAN);
         buffer.putInt(8 + payload.length).put(name).put(payload);
         return buffer.array();
     }
