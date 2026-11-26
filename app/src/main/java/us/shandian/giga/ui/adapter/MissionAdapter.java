@@ -26,11 +26,13 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -202,7 +204,6 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         h.icon.setImageResource(Utility.getIconForFileType(type));
         h.name.setText(item.mission.storage.getName());
 
-        h.progress.setColors(Utility.getBackgroundForFileType(mContext, type), Utility.getForegroundForFileType(mContext, type));
 
         if (h.item.mission instanceof DownloadMission) {
             DownloadMission mission = (DownloadMission) item.mission;
@@ -224,6 +225,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
             Date date = new Date(item.mission.timestamp);
             h.date.setText(dateFormat.format(date));
+            setFinishedState(h);
         }
     }
 
@@ -242,6 +244,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         if (h == null || h.item == null || h.item.mission instanceof FinishedMission) return;
 
         DownloadMission mission = (DownloadMission) h.item.mission;
+        setMissionState(h, mission);
         double done = mission.done;
         long length = mission.getLength();
         long now = System.currentTimeMillis();
@@ -831,6 +834,56 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         HandlerCompat.postDelayed(mHandler, this::updater, UPDATER, 1000);
     }
 
+    private int resolveThemeColor(final int attribute, final int fallback) {
+        final TypedValue value = new TypedValue();
+        if (!mContext.getTheme().resolveAttribute(attribute, value, true)) return fallback;
+        return value.resourceId != 0
+                ? mContext.getResources().getColor(value.resourceId) : value.data;
+    }
+
+    private void setMissionState(@NonNull final ViewHolderItem holder,
+                                 @NonNull final DownloadMission mission) {
+        final int color;
+        @StringRes final int status;
+        if (mission.errCode != ERROR_NOTHING) {
+            status = R.string.download_status_failed;
+            color = resolveThemeColor(R.attr.npColorError, Color.RED);
+        } else if (mission.isRecovering()) {
+            status = R.string.download_status_recovering;
+            color = resolveThemeColor(R.attr.npColorWarning, Color.YELLOW);
+        } else if (mission.isPsRunning()) {
+            status = R.string.download_status_processing;
+            color = resolveThemeColor(R.attr.npColorAccent, Color.BLUE);
+        } else if (mission.running) {
+            status = R.string.download_status_downloading;
+            color = resolveThemeColor(R.attr.npColorAccent, Color.BLUE);
+        } else if (mission.enqueued) {
+            status = R.string.download_status_queued;
+            color = resolveThemeColor(R.attr.npColorWarning, Color.YELLOW);
+        } else {
+            status = R.string.download_status_paused;
+            color = resolveThemeColor(R.attr.npColorOnSurfaceVariant, Color.GRAY);
+        }
+        holder.state.setText(status);
+        final GradientDrawable badge = new GradientDrawable();
+        badge.setColor((color & 0x00FFFFFF) | 0x24000000);
+        badge.setCornerRadius(32f);
+        holder.state.setBackground(badge);
+        holder.state.setTextColor(color);
+        holder.progress.setColors(resolveThemeColor(R.attr.npColorSurface3, Color.DKGRAY), color);
+    }
+
+    private void setFinishedState(@NonNull final ViewHolderItem holder) {
+        final int color = resolveThemeColor(R.attr.npColorSuccess, Color.GREEN);
+        holder.state.setText(R.string.download_status_completed);
+        final GradientDrawable badge = new GradientDrawable();
+        badge.setColor((color & 0x00FFFFFF) | 0x24000000);
+        badge.setCornerRadius(32f);
+        holder.state.setBackground(badge);
+        holder.state.setTextColor(color);
+        holder.progress.setColors(resolveThemeColor(R.attr.npColorSurface3, Color.DKGRAY), color);
+    }
+
     private boolean isNotFinite(double value) {
         return Double.isNaN(value) || Double.isInfinite(value);
     }
@@ -848,6 +901,7 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         TextView name;
         TextView size;
         TextView date;
+        TextView state;
         ProgressDrawable progress;
 
         PopupMenu popupMenu;
@@ -872,13 +926,14 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
             super(view);
 
             progress = new ProgressDrawable();
-            itemView.findViewById(R.id.item_bkg).setBackground(progress);
+            itemView.findViewById(R.id.item_progress).setBackground(progress);
 
             status = itemView.findViewById(R.id.item_status);
             name = itemView.findViewById(R.id.item_name);
             icon = itemView.findViewById(R.id.item_icon);
             size = itemView.findViewById(R.id.item_size);
             date = itemView.findViewById(R.id.item_date);
+            state = itemView.findViewById(R.id.item_state);
 
             name.setSelected(true);
 
