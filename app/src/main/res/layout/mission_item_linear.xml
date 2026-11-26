@@ -87,6 +87,36 @@
             android:src="@drawable/ic_more_vert"
             app:tint="?attr/actionColor" />
 
+
+        <TextView
+            android:id="@+id/item_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_size"
+            android:layout_toEndOf="@id/item_icon"
+            android:layout_toStartOf="@id/item_more"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/download_mission_card"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="11sp" />
+
+        <View
+            android:id="@+id/item_progress"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_below="@id/item_state"
+            android:layout_toEndOf="@id/item_icon"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/download_progress_track" />
     </RelativeLayout>
 
 </RelativeLayout>
