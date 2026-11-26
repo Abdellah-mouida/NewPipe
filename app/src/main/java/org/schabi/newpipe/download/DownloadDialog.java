@@ -362,9 +362,9 @@ public class DownloadDialog extends DialogFragment
     @Override
     public void onStart() {
         super.onStart();
-        if (getDialog() == null) return;
+        if (getDialog() == null) {\n            return;\n        }
         final Window window = getDialog().getWindow();
-        if (window == null) return;
+        if (window == null) {\n            return;\n        }
         window.setBackgroundDrawableResource(android.R.color.transparent);
         final WindowManager.LayoutParams attributes = window.getAttributes();
         attributes.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
