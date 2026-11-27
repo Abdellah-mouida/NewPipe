@@ -167,12 +167,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: gradle
-          # Version the shared Gradle cache when CI's dependency preparation changes.
-          cache-dependency-path: |
-            gradle/libs.versions.toml
-            gradle/wrapper/gradle-wrapper.properties
-            .github/workflows/ci.yml
+
+      - name: Restore Gradle cache shared by emulator matrix
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-emulator-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', '.github/workflows/ci.yml') }}-${{ matrix.api-level }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-emulator-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle.properties', '.github/workflows/ci.yml') }}-
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
