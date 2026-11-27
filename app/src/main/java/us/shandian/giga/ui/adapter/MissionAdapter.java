@@ -265,6 +265,17 @@ public class MissionAdapter extends Adapter<ViewHolder> implements Handler.Callb
         final String thumbnailUrl = mission.thumbnailUrl;
         holder.icon.setTag(thumbnailUrl);
         holder.icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        holder.icon.post(() -> {
+            final int width = holder.icon.getWidth();
+            if (width > 0) {
+                final ViewGroup.LayoutParams params = holder.icon.getLayoutParams();
+                final int targetHeight = width * 9 / 16;
+                if (params.height != targetHeight) {
+                    params.height = targetHeight;
+                    holder.icon.setLayoutParams(params);
+                }
+            }
+        });
         holder.icon.setImageResource(Utility.getIconForFileType(type));
         holder.icon.setColorFilter(Color.WHITE);
         if (thumbnailUrl == null || thumbnailUrl.isEmpty()) {
