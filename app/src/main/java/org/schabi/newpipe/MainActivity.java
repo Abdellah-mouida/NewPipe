@@ -486,6 +486,10 @@ public class MainActivity extends AppCompatActivity {
         final StreamingService currentService = ServiceHelper.getSelectedService(this);
         int kioskMenuItemId = 0;
         for (final String kioskId : currentService.getKioskList().getAvailableKiosks()) {
+            if ("What's New".equalsIgnoreCase(kioskId)
+                    || "whats_new".equalsIgnoreCase(kioskId)) {
+                continue;
+            }
             if (kioskMenuItemId == item.getItemId()) {
                 NavigationHelper.openKioskFragment(getSupportFragmentManager(),
                         currentService.getServiceId(), kioskId);
