@@ -43,6 +43,11 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+          # Version the shared Gradle cache when CI's dependency preparation changes.
+          cache-dependency-path: |
+            gradle/libs.versions.toml
+            gradle/wrapper/gradle-wrapper.properties
+            .github/workflows/ci.yml
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
@@ -67,13 +72,22 @@ jobs:
           set -uo pipefail
           log_file="$RUNNER_TEMP/gradle-build.log"
           for attempt in 1 2 3 4; do
-            echo "Gradle build attempt $attempt/4"
-            if ./gradlew --no-daemon \
-              assembleContinuous \
-              lintContinuous \
-              testDebugUnitTest \
-              --stacktrace \
-              -DskipFormatKtlint >"$log_file" 2>&1; then
+            echo "Gradle build and instrumentation-test compilation attempt $attempt/4"
+            gradle_args=(
+              --no-daemon
+              assembleContinuous
+              lintContinuous
+              testDebugUnitTest
+              assembleDebugAndroidTest
+              --stacktrace
+              -DskipFormatKtlint
+            )
+            # Refresh metadata and negative lookup results after a dependency-resolution failure.
+            if [[ "$attempt" -gt 1 ]]; then
+              gradle_args+=(--refresh-dependencies)
+            fi
+
+            if ./gradlew "${gradle_args[@]}" >"$log_file" 2>&1; then
               cat "$log_file"
               exit 0
             else
@@ -81,18 +95,21 @@ jobs:
               cat "$log_file"
             fi
 
-            # Retry only dependency-server throttling; never hide source or test failures.
-            if ! grep -Eiq 'status code 429|HTTP 429|Too Many Requests' "$log_file"; then
+            # Retry only repository/dependency-resolution failures. Source, lint and test failures
+            # still fail immediately and cannot be hidden by a retry.
+            if ! grep -Eiq \
+              'status code 429|HTTP 429|Too Many Requests|Could not find [[:alnum:]_.-]+:[[:alnum:]_.-]+:|Could not resolve all files for configuration|ModuleVersionNotFoundException|Could not GET|Read timed out|Connection reset|UnknownHostException' \
+              "$log_file"; then
               exit "$result"
             fi
 
             if [[ "$attempt" -eq 4 ]]; then
-              echo "Maven repository kept returning HTTP 429 after four attempts." >&2
+              echo "Dependency resolution failed after four attempts, including refreshed metadata." >&2
               exit "$result"
             fi
 
-            delay=$((30 * (2 ** (attempt - 1))))
-            echo "Maven Central rate-limited dependency resolution; retrying in ${delay}s."
+            delay=$((20 * (2 ** (attempt - 1))))
+            echo "Dependency repository lookup failed; retrying with refreshed Gradle metadata in ${delay}s."
             sleep "$delay"
           done
 
@@ -148,6 +165,11 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+          # Version the shared Gradle cache when CI's dependency preparation changes.
+          cache-dependency-path: |
+            gradle/libs.versions.toml
+            gradle/wrapper/gradle-wrapper.properties
+            .github/workflows/ci.yml
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
@@ -233,6 +255,11 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+          # Version the shared Gradle cache when CI's dependency preparation changes.
+          cache-dependency-path: |
+            gradle/libs.versions.toml
+            gradle/wrapper/gradle-wrapper.properties
+            .github/workflows/ci.yml
 
       - name: Set up Android SDK
         if: steps.head.outputs.current == 'true'
