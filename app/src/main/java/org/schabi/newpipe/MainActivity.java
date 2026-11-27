@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int ITEM_ID_FEED = -2;
     private static final int ITEM_ID_BOOKMARKS = -3;
     private static final int ITEM_ID_DOWNLOADS = -4;
+    private static final int ITEM_ID_KIOSK_DOWNLOADS = Integer.MIN_VALUE;
     private static final int ITEM_ID_HISTORY = -5;
     private static final int ITEM_ID_SETTINGS = 0;
     private static final int ITEM_ID_DONATION = 1;
@@ -380,25 +381,36 @@ public class MainActivity extends AppCompatActivity {
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_BOOKMARKS, ORDER, R.string.tab_bookmarks)
                 .setIcon(R.drawable.ic_bookmark);
-        drawerLayoutBinding.navigation.getMenu()
-                .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
-                .setIcon(R.drawable.ic_file_download);
+        final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
+        final StreamingService service = NewPipe.getService(currentServiceId);
+        final boolean hasWhatsNewKiosk = service.getKioskList().getAvailableKiosks().stream()
+                .anyMatch(ks -> "What's New".equalsIgnoreCase(ks)
+                        || "whats_new".equalsIgnoreCase(ks));
+        if (!hasWhatsNewKiosk) {
+            drawerLayoutBinding.navigation.getMenu()
+                    .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
+                    .setIcon(R.drawable.ic_file_download);
+        }
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_HISTORY, ORDER, R.string.action_history)
                 .setIcon(R.drawable.ic_history);
 
         //Kiosks
-        final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
-        final StreamingService service = NewPipe.getService(currentServiceId);
-
         int kioskMenuItemId = 0;
 
         for (final String ks : service.getKioskList().getAvailableKiosks()) {
-            drawerLayoutBinding.navigation.getMenu()
-                    .add(R.id.menu_kiosks_group, kioskMenuItemId, 0, KioskTranslator
-                            .getTranslatedKioskName(ks, this))
-                    .setIcon(KioskTranslator.getKioskIcon(ks));
-            kioskMenuItemId++;
+            if ("What's New".equalsIgnoreCase(ks) || "whats_new".equalsIgnoreCase(ks)) {
+                drawerLayoutBinding.navigation.getMenu()
+                        .add(R.id.menu_kiosks_group, ITEM_ID_KIOSK_DOWNLOADS, 0,
+                                R.string.downloads)
+                        .setIcon(R.drawable.ic_file_download);
+            } else {
+                drawerLayoutBinding.navigation.getMenu()
+                        .add(R.id.menu_kiosks_group, kioskMenuItemId, 0, KioskTranslator
+                                .getTranslatedKioskName(ks, this))
+                        .setIcon(KioskTranslator.getKioskIcon(ks));
+                kioskMenuItemId++;
+            }
         }
 
         //Settings and About
@@ -467,6 +479,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void kioskSelected(final MenuItem item) throws ExtractionException {
+        if (item.getItemId() == ITEM_ID_KIOSK_DOWNLOADS) {
+            NavigationHelper.openDownloads(this);
+            return;
+        }
         final StreamingService currentService = ServiceHelper.getSelectedService(this);
         int kioskMenuItemId = 0;
         for (final String kioskId : currentService.getKioskList().getAvailableKiosks()) {
