@@ -11,13 +11,60 @@ case "$api_level" in
     ;;
 esac
 
-./gradlew --no-daemon connectedCheck --stacktrace
+run_gradle_with_dependency_retries() {
+  task="$1"
+  shift
+  attempt=1
+  log_file="${RUNNER_TEMP:-/tmp}/gradle-emulator-${api_level}.log"
+
+  while [ "$attempt" -le 4 ]; do
+    echo "Gradle $task attempt $attempt/4"
+    if [ "$attempt" -eq 1 ]; then
+      if ./gradlew --no-daemon "$task" "$@" >"$log_file" 2>&1; then
+        result=0
+      else
+        result=$?
+      fi
+    else
+      if ./gradlew --no-daemon --refresh-dependencies "$task" "$@" >"$log_file" 2>&1; then
+        result=0
+      else
+        result=$?
+      fi
+    fi
+    cat "$log_file"
+
+    if [ "$result" -eq 0 ]; then
+      return 0
+    fi
+
+    # Retry only transient repository failures. Real test or source failures
+    # must fail immediately rather than being hidden by another attempt.
+    if ! grep -Eiq \
+      'status code 429|HTTP 429|Too Many Requests|status code 5(02|03|04)|HTTP 5(02|03|04)|Could not resolve all files for configuration|ModuleVersionNotFoundException|Could not GET|Read timed out|Connection reset|UnknownHostException' \
+      "$log_file"; then
+      return "$result"
+    fi
+
+    if [ "$attempt" -eq 4 ]; then
+      echo "Dependency resolution failed after four attempts." >&2
+      return "$result"
+    fi
+
+    delay=$((20 * (2 ** (attempt - 1))))
+    echo "Transient dependency lookup failure; retrying with refreshed metadata in ${delay}s."
+    sleep "$delay"
+    attempt=$((attempt + 1))
+  done
+}
+
+run_gradle_with_dependency_retries connectedCheck --stacktrace
 
 # API 27 is Android 8.1, the platform in the reported ACRA crash.
 # Build and launch the real app here so resource inflation failures cannot
 # slip through a compile-only CI run.
 if [ "$api_level" = "27" ]; then
-  ./gradlew --no-daemon assembleContinuous --stacktrace
+  run_gradle_with_dependency_retries assembleContinuous --stacktrace
 
   apk="$(find app/build/outputs/apk/continuous -maxdepth 1 -type f -name '*.apk' -print -quit)"
   test -n "$apk"
