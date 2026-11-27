@@ -383,9 +383,14 @@ public class MainActivity extends AppCompatActivity {
                 .setIcon(R.drawable.ic_bookmark);
         final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
         final StreamingService service = NewPipe.getService(currentServiceId);
-        final boolean hasWhatsNewKiosk = service.getKioskList().getAvailableKiosks().stream()
-                .anyMatch(ks -> "What's New".equalsIgnoreCase(ks)
-                        || "whats_new".equalsIgnoreCase(ks));
+        boolean hasWhatsNewKiosk = false;
+        for (final String kiosk : service.getKioskList().getAvailableKiosks()) {
+            if ("What's New".equalsIgnoreCase(kiosk)
+                    || "whats_new".equalsIgnoreCase(kiosk)) {
+                hasWhatsNewKiosk = true;
+                break;
+            }
+        }
         if (!hasWhatsNewKiosk) {
             drawerLayoutBinding.navigation.getMenu()
                     .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
