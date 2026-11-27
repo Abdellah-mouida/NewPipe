@@ -19,6 +19,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
@@ -406,6 +407,7 @@ public class DownloadDialog extends DialogFragment
         final WindowManager.LayoutParams attributes = window.getAttributes();
         attributes.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
         attributes.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        attributes.gravity = Gravity.CENTER;
         attributes.dimAmount = 0.38f;
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         window.setAttributes(attributes);
