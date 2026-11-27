@@ -176,7 +176,7 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-emulator-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', '.github/workflows/ci.yml') }}-${{ matrix.api-level }}
           restore-keys: |
-            ${{ runner.os }}-gradle-emulator-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle.properties', '.github/workflows/ci.yml') }}-
+            ${{ runner.os }}-gradle-emulator-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', '.github/workflows/ci.yml') }}-
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
