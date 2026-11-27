@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int ITEM_ID_FEED = -2;
     private static final int ITEM_ID_BOOKMARKS = -3;
     private static final int ITEM_ID_DOWNLOADS = -4;
-    private static final int ITEM_ID_KIOSK_DOWNLOADS = Integer.MIN_VALUE;
     private static final int ITEM_ID_HISTORY = -5;
     private static final int ITEM_ID_SETTINGS = 0;
     private static final int ITEM_ID_DONATION = 1;
@@ -383,19 +382,9 @@ public class MainActivity extends AppCompatActivity {
                 .setIcon(R.drawable.ic_bookmark);
         final int currentServiceId = ServiceHelper.getSelectedServiceId(this);
         final StreamingService service = NewPipe.getService(currentServiceId);
-        boolean hasWhatsNewKiosk = false;
-        for (final String kiosk : service.getKioskList().getAvailableKiosks()) {
-            if ("What's New".equalsIgnoreCase(kiosk)
-                    || "whats_new".equalsIgnoreCase(kiosk)) {
-                hasWhatsNewKiosk = true;
-                break;
-            }
-        }
-        if (!hasWhatsNewKiosk) {
-            drawerLayoutBinding.navigation.getMenu()
-                    .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
-                    .setIcon(R.drawable.ic_file_download);
-        }
+        drawerLayoutBinding.navigation.getMenu()
+                .add(R.id.menu_tabs_group, ITEM_ID_DOWNLOADS, ORDER, R.string.downloads)
+                .setIcon(R.drawable.ic_file_download);
         drawerLayoutBinding.navigation.getMenu()
                 .add(R.id.menu_tabs_group, ITEM_ID_HISTORY, ORDER, R.string.action_history)
                 .setIcon(R.drawable.ic_history);
@@ -404,18 +393,14 @@ public class MainActivity extends AppCompatActivity {
         int kioskMenuItemId = 0;
 
         for (final String ks : service.getKioskList().getAvailableKiosks()) {
-            if ("What's New".equalsIgnoreCase(ks) || "whats_new".equalsIgnoreCase(ks)) {
-                drawerLayoutBinding.navigation.getMenu()
-                        .add(R.id.menu_kiosks_group, ITEM_ID_KIOSK_DOWNLOADS, 0,
-                                R.string.downloads)
-                        .setIcon(R.drawable.ic_file_download);
-            } else {
-                drawerLayoutBinding.navigation.getMenu()
-                        .add(R.id.menu_kiosks_group, kioskMenuItemId, 0, KioskTranslator
-                                .getTranslatedKioskName(ks, this))
-                        .setIcon(KioskTranslator.getKioskIcon(ks));
-                kioskMenuItemId++;
+            if (isWhatsNewKiosk(ks)) {
+                continue;
             }
+            drawerLayoutBinding.navigation.getMenu()
+                    .add(R.id.menu_kiosks_group, kioskMenuItemId, 0, KioskTranslator
+                            .getTranslatedKioskName(ks, this))
+                    .setIcon(KioskTranslator.getKioskIcon(ks));
+            kioskMenuItemId++;
         }
 
         //Settings and About
@@ -483,16 +468,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isWhatsNewKiosk(@NonNull final String kioskId) {
+        final String translatedName = KioskTranslator.getTranslatedKioskName(kioskId, this);
+        return "What's New".equalsIgnoreCase(kioskId)
+                || "whats_new".equalsIgnoreCase(kioskId)
+                || "New & hot".equalsIgnoreCase(kioskId)
+                || "What's New".equalsIgnoreCase(translatedName)
+                || "New & hot".equalsIgnoreCase(translatedName);
+    }
+
     private void kioskSelected(final MenuItem item) throws ExtractionException {
-        if (item.getItemId() == ITEM_ID_KIOSK_DOWNLOADS) {
-            NavigationHelper.openDownloads(this);
-            return;
-        }
         final StreamingService currentService = ServiceHelper.getSelectedService(this);
         int kioskMenuItemId = 0;
         for (final String kioskId : currentService.getKioskList().getAvailableKiosks()) {
-            if ("What's New".equalsIgnoreCase(kioskId)
-                    || "whats_new".equalsIgnoreCase(kioskId)) {
+            if (isWhatsNewKiosk(kioskId)) {
                 continue;
             }
             if (kioskMenuItemId == item.getItemId()) {
