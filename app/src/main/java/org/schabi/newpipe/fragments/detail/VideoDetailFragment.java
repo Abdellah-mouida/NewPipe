@@ -1299,10 +1299,24 @@ public final class VideoDetailFragment
                     // Removing and re-adding a SurfaceView destroys its native surface,
                     // causing a black screen until the video decoder hits the next
                     // keyframe (2-5 seconds on typical DASH/HLS streams).
-                    if (playerUi.getBinding().getRoot().getParent()
-                            != binding.playerPlaceholder) {
+                    final View playerRoot = playerUi.getBinding().getRoot();
+                    // Re-apply match-parent sizing after every player reparent. The player can
+                    // retain stale layout params from another host, which leaves side gaps.
+                    playerRoot.setLayoutParams(new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    final ViewGroup.LayoutParams placeholderParams =
+                            binding.playerPlaceholder.getLayoutParams();
+                    if (placeholderParams.width != ViewGroup.LayoutParams.MATCH_PARENT) {
+                        placeholderParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        binding.playerPlaceholder.setLayoutParams(placeholderParams);
+                    }
+                    if (playerRoot.getParent() != binding.playerPlaceholder) {
                         playerUi.removeViewFromParent();
-                        binding.playerPlaceholder.addView(playerUi.getBinding().getRoot());
+                        binding.playerPlaceholder.addView(playerRoot,
+                                new FrameLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT));
                     }
                     playerUi.setupVideoSurfaceIfNeeded();
                 }
