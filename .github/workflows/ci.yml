@@ -140,6 +140,9 @@ jobs:
 
     strategy:
       fail-fast: false
+      # Emulator jobs resolve the same Android test-platform artifacts. Run them
+      # serially so Maven Central is not hit by three cold Gradle caches at once.
+      max-parallel: 1
       matrix:
         include:
           - api-level: 23
