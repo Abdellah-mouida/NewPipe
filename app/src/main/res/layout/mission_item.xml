@@ -18,6 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:background="@drawable/download_thumbnail_outline"
+            android:clipToOutline="true"
             android:contentDescription="@string/metadata_thumbnails"
             android:scaleType="centerCrop" />
         <RelativeLayout
