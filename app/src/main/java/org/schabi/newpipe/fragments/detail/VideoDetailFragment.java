@@ -1300,8 +1300,13 @@ public final class VideoDetailFragment
                     // causing a black screen until the video decoder hits the next
                     // keyframe (2-5 seconds on typical DASH/HLS streams).
                     final View playerRoot = playerUi.getBinding().getRoot();
-                    // Re-apply match-parent sizing after every player reparent. The player can
-                    // retain stale layout params from another host, which leaves side gaps.
+                    final boolean needsReparent = playerRoot.getParent()
+                            != binding.playerPlaceholder;
+                    if (needsReparent) {
+                        playerUi.removeViewFromParent();
+                    }
+                    // Re-apply match-parent sizing after every reparent. The player can retain
+                    // stale layout params from another host, which leaves visible side gaps.
                     playerRoot.setLayoutParams(new FrameLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT));
@@ -1311,8 +1316,7 @@ public final class VideoDetailFragment
                         placeholderParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                         binding.playerPlaceholder.setLayoutParams(placeholderParams);
                     }
-                    if (playerRoot.getParent() != binding.playerPlaceholder) {
-                        playerUi.removeViewFromParent();
+                    if (needsReparent) {
                         binding.playerPlaceholder.addView(playerRoot,
                                 new FrameLayout.LayoutParams(
                                         ViewGroup.LayoutParams.MATCH_PARENT,
