@@ -51,7 +51,11 @@ run_gradle_with_dependency_retries() {
       return "$result"
     fi
 
-    delay=$((20 * (2 ** (attempt - 1))))
+    case "$attempt" in
+      1) delay=20 ;;
+      2) delay=40 ;;
+      3) delay=80 ;;
+    esac
     echo "Transient dependency lookup failure; retrying with refreshed metadata in ${delay}s."
     sleep "$delay"
     attempt=$((attempt + 1))
