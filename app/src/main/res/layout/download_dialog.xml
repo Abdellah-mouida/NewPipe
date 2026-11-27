@@ -1,13 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<eightbitlab.com.blurview.BlurView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/download_dialog_blur"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/download_dialog_glass">
 
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/download_dialog_blur"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/download_dialog_glass" />
+        android:layout_height="wrap_content">
 
     <include
         android:id="@+id/toolbar_layout"
@@ -159,4 +159,5 @@
         android:text="@string/streams_not_yet_supported_removed"
         android:textSize="12sp" />
 
-</RelativeLayout>
+    </RelativeLayout>
+</eightbitlab.com.blurview.BlurView>
