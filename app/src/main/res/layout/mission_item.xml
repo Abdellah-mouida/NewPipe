@@ -8,11 +8,18 @@
         android:id="@+id/item_bkg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="3dp"
-        android:background="@drawable/download_mission_card"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="14dp"
+        android:background="@android:color/transparent"
         android:paddingBottom="6dp">
+        <ImageView
+            android:id="@+id/item_icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/metadata_thumbnails"
+            android:scaleType="centerCrop" />
         <RelativeLayout
             android:id="@+id/item_title_line"
             android:layout_width="match_parent"
@@ -43,13 +50,6 @@
                 android:src="@drawable/ic_more_vert"
                 app:tint="@color/white" />
         </RelativeLayout>
-        <ImageView
-            android:id="@+id/item_icon"
-            android:layout_width="match_parent"
-            android:layout_height="142dp"
-            android:layout_below="@id/item_title_line"
-            android:contentDescription="@string/metadata_thumbnails"
-            android:scaleType="centerCrop" />
         <org.schabi.newpipe.views.NewPipeTextView
             android:id="@+id/item_name"
             android:layout_width="match_parent"
@@ -94,7 +94,7 @@
             android:layout_below="@id/item_size"
             android:layout_marginStart="10dp"
             android:layout_marginTop="7dp"
-            android:background="@drawable/download_mission_card"
+            android:background="@android:color/transparent"
             android:paddingStart="9dp"
             android:paddingTop="3dp"
             android:paddingEnd="9dp"
