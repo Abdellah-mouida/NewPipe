@@ -296,7 +296,7 @@ public class DownloadDialog extends DialogFragment
                     + "inflater = [" + inflater + "], container = [" + container + "], "
                     + "savedInstanceState = [" + savedInstanceState + "]");
         }
-        return inflater.inflate(R.layout.download_dialog, container);
+        return inflater.inflate(R.layout.download_dialog, container, false);
     }
 
     @Override
@@ -405,12 +405,14 @@ public class DownloadDialog extends DialogFragment
         }
         window.setBackgroundDrawableResource(android.R.color.transparent);
         final WindowManager.LayoutParams attributes = window.getAttributes();
-        attributes.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+        final int dialogWidth = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+        attributes.width = dialogWidth;
         attributes.height = WindowManager.LayoutParams.WRAP_CONTENT;
         attributes.gravity = Gravity.CENTER;
         attributes.dimAmount = 0.38f;
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         window.setAttributes(attributes);
+        window.setLayout(dialogWidth, WindowManager.LayoutParams.WRAP_CONTENT);
 
         final View dialogView = getView();
         final Activity activity = getActivity();
